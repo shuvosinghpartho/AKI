@@ -194,7 +194,8 @@ export default {
   },
   methods: {
     navigateToDataProcessing() {
-      this.$router.push('/data-processing')
+      // Navigate to upload CSV file first
+      this.$router.push('/upload-csv')
     },
     launchImageAnnotation() {
       console.log('Launching Image Annotation tool...')

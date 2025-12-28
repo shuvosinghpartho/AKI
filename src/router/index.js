@@ -17,6 +17,11 @@ const routes = [
     component: () => import('../views/SignUpView.vue')
   },
   {
+    path: '/upload-csv',
+    name: 'UploadCSVFile',
+    component: () => import('../views/UploadCSVFile.vue')
+  },
+  {
     path: '/data-processing',
     name: 'DataProcessing',
     component: () => import('../views/DataProcessingView.vue')
@@ -30,6 +35,21 @@ const routes = [
     path: '/filtering',
     name: 'Filtering',
     component: () => import('../views/FilteringView.vue')
+  },
+  {
+    path: '/process',
+    name: 'Process',
+    component: () => import('../views/ProcessView.vue')
+  },
+  {
+    path: '/training',
+    name: 'Training',
+    component: () => import('../views/TrainingView.vue')
+  },
+  {
+    path: '/predict',
+    name: 'Predict',
+    component: () => import('../views/PredictView.vue')
   }
 ]
 

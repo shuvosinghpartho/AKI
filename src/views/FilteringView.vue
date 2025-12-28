@@ -183,7 +183,7 @@
           Back
         </button>
 
-        <button class="btn-next">
+        <button class="btn-next" @click="goToProcess">
           Next Step <ion-icon name="arrow-forward-outline"></ion-icon>
         </button>
       </div>
@@ -447,6 +447,10 @@ export default {
 
     goHome() {
       this.$router.push('/')
+    },
+
+    goToProcess() {
+      this.$router.push('/process')
     }
   }
 }
