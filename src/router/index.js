@@ -10,6 +10,26 @@ const routes = [
     path: '/signin',
     name: 'SignIn',
     component: () => import('../views/SignInView.vue')
+  },
+  {
+    path: '/signup',
+    name: 'SignUp',
+    component: () => import('../views/SignUpView.vue')
+  },
+  {
+    path: '/data-processing',
+    name: 'DataProcessing',
+    component: () => import('../views/DataProcessingView.vue')
+  },
+  {
+    path: '/cleaning',
+    name: 'Cleaning',
+    component: () => import('../views/CleaningView.vue')
+  },
+  {
+    path: '/filtering',
+    name: 'Filtering',
+    component: () => import('../views/FilteringView.vue')
   }
 ]
 

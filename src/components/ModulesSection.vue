@@ -47,16 +47,15 @@
             <p class="text-sm text-gray-400 leading-relaxed mb-6">
               Access the central neural network. Monitor real-time analytics and manage kinetic models with sub-millisecond latency.
             </p>
-            <a :href="modules[0].link" target="_blank" class="block">
-              <button 
-                class="mt-auto w-full py-3 rounded-xl border border-white/10 bg-white/[0.02] text-sm font-medium text-gray-300 
-                       hover:text-white hover:bg-white/5 hover:border-brand-red/50 transition-all 
-                       flex items-center justify-center gap-2 
-                       group-hover:bg-brand-red group-hover:border-brand-red group-hover:text-white">
-                Access Module
-                <i class="fa-solid fa-arrow-right text-xs opacity-50 group-hover:opacity-100"></i>
-              </button>
-            </a>
+            <button 
+              class="mt-auto w-full py-3 rounded-xl border border-white/10 bg-white/[0.02] text-sm font-medium text-gray-300 
+                     hover:text-white hover:bg-white/5 hover:border-brand-red/50 transition-all 
+                     flex items-center justify-center gap-2 
+                     group-hover:bg-brand-red group-hover:border-brand-red group-hover:text-white"
+              @click="navigateToDataProcessing">
+              Access Module
+              <i class="fa-solid fa-arrow-right text-xs opacity-50 group-hover:opacity-100"></i>
+            </button>
           </div>
         </div>
 
@@ -194,6 +193,9 @@ export default {
     }
   },
   methods: {
+    navigateToDataProcessing() {
+      this.$router.push('/data-processing')
+    },
     launchImageAnnotation() {
       console.log('Launching Image Annotation tool...')
       alert('Image Annotation tool would launch here')
