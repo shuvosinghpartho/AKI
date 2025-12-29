@@ -1,100 +1,152 @@
 <template>
-  <div class="predict-container">
-    <!-- Top Bar -->
-    <div class="top-bar">
-      <div class="brand-text" style="font-weight:800; color:white;">
-        AKI <span style="color:var(--aki-teal)">PREDICT</span>
+  <div class="predict-container" :class="{ collapsed: isCollapsed }">
+    
+    <nav class="sidebar" id="sidebar">
+      <div class="logo-container">
+        <ion-icon name="bulb-outline" style="font-size: 1.5rem; color: var(--aki-primary); vertical-align: middle;"></ion-icon>
+        <span class="logo-text hide-on-collapse" style="margin-left: 10px;">AKI PREDICT</span>
       </div>
-      <div class="pipeline-stepper">
-        <div class="step">CLEAN</div>
-        <div class="step">FILTER</div>
-        <div class="step">PROCESS</div>
-        <div class="step">TRAIN</div>
-        <div class="step active">PREDICT</div>
-      </div>
-      <button class="action-btn" title="Home" @click="goHome">
-        <ion-icon name="home-outline" style="font-size:1.5rem; color:white;"></ion-icon>
-      </button>
-    </div>
 
-    <!-- Main Content -->
-    <div class="container">
-      <!-- Input Panel -->
-      <div class="input-panel">
-        <div class="panel-title">Input Features</div>
-        <div class="form-scroll">
-          <div class="form-group">
-            <label>Bedrooms</label>
-            <input 
-              type="number" 
-              class="custom-input" 
-              placeholder="e.g. 3"
-              v-model.number="formData.bedrooms"
-            >
+      <div class="tools-wrapper">
+        <div class="section-title hide-on-collapse">PREDICTION TOOLS</div>
+
+        <div class="tool-item" :class="{ active: activeTool === 'input-mode' }">
+          <div class="tool-header" @click="toggleTool('input-mode')">
+            <ion-icon name="create-outline"></ion-icon>
+            <span class="tool-label">Input Mode</span>
+            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
           </div>
-          <div class="form-group">
-            <label>Bathrooms</label>
-            <input 
-              type="number" 
-              class="custom-input" 
-              placeholder="e.g. 2"
-              v-model.number="formData.bathrooms"
-            >
-          </div>
-          <div class="form-group">
-            <label>Square Footage</label>
-            <input 
-              type="number" 
-              class="custom-input" 
-              placeholder="e.g. 1500"
-              v-model.number="formData.squareFootage"
-            >
-          </div>
-          <div class="form-group">
-            <label>Year Built</label>
-            <input 
-              type="number" 
-              class="custom-input" 
-              placeholder="e.g. 2010"
-              v-model.number="formData.yearBuilt"
-            >
-          </div>
-          <div class="form-group">
-            <label>Location Score (1-10)</label>
-            <input 
-              type="number" 
-              class="custom-input" 
-              placeholder="e.g. 8"
-              v-model.number="formData.locationScore"
-              min="1"
-              max="10"
-            >
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'input-mode' ? '200px' : '0' }">
+            <div class="form-pad hide-on-collapse">
+               <div class="model-option selected">
+                 <ion-icon name="keypad-outline"></ion-icon>
+                 <span>Manual Entry</span>
+               </div>
+               <div class="model-option">
+                 <ion-icon name="cloud-upload-outline"></ion-icon>
+                 <span>Batch CSV</span>
+               </div>
+            </div>
           </div>
         </div>
-        <button class="predict-btn" @click="runPrediction" :disabled="!isFormValid">
-          Run Prediction
+
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="nav-btn nav-finish" @click="goHome">
+          <span>FINISH</span>
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
         </button>
       </div>
+    </nav>
 
-      <!-- Result Panel -->
-      <div class="result-panel">
-        <div class="empty-state" v-if="!showResults">
-          <ion-icon name="cube-outline" style="font-size:3rem; margin-bottom:10px; opacity:0.5;"></ion-icon>
-          <p>Fill in the features and click "Run Prediction" to see results.</p>
+    <main class="main-view">
+      
+      <header class="top-header">
+        <div class="header-left">
+          <button class="menu-toggle" @click="toggleSidebar">
+            <ion-icon name="menu-outline"></ion-icon>
+          </button>
         </div>
 
-        <div class="result-card" v-if="showResults" :class="{ show: showResults }">
-          <div style="font-size:0.8rem; text-transform:uppercase; color:#888; letter-spacing:1px;">
-            Predicted Value
-          </div>
-          <div class="prediction-value">${{ formatNumber(predictionResult.value) }}</div>
-          <div class="confidence">Confidence: {{ predictionResult.confidence }}%</div>
-          <div style="margin-top:20px; font-size:0.8rem; color:#666;">
-            Model: {{ predictionResult.model }}
+        <div class="header-center">
+          <div class="pipeline">
+            <div class="step">CLEAN</div>
+            <div class="step">FILTER</div>
+            <div class="step">PROCESS</div>
+            <div class="step">TRAIN</div>
+            <div class="step active">PREDICT</div>
           </div>
         </div>
+
+        <div class="header-right">
+          <button class="top-nav-btn" @click="goHome">
+            <ion-icon name="home-outline"></ion-icon>
+            <span>Home</span>
+          </button>
+          
+          <button class="top-nav-btn logout">
+            <ion-icon name="log-out-outline"></ion-icon>
+            <span>Logout</span>
+          </button>
+          
+          <div class="user-avatar">
+            <ion-icon name="person-circle-outline"></ion-icon>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-grid">
+        
+        <div class="glass-panel">
+          <div class="panel-head">
+            <span class="panel-label" style="color: #ffcc00;">● INPUT FEATURES</span>
+            <ion-icon name="create-outline" style="color:#666;"></ion-icon>
+          </div>
+          <div class="panel-content-pad">
+            
+            <div class="input-group">
+              <label class="sub-label">Bedrooms</label>
+              <input type="number" class="f-input" v-model.number="formData.bedrooms" placeholder="e.g. 3">
+            </div>
+
+            <div class="input-group">
+              <label class="sub-label">Bathrooms</label>
+              <input type="number" class="f-input" v-model.number="formData.bathrooms" placeholder="e.g. 2">
+            </div>
+
+            <div class="input-group">
+              <label class="sub-label">Square Footage</label>
+              <input type="number" class="f-input" v-model.number="formData.squareFootage" placeholder="e.g. 1500">
+            </div>
+
+            <div class="input-group">
+              <label class="sub-label">Year Built</label>
+              <input type="number" class="f-input" v-model.number="formData.yearBuilt" placeholder="e.g. 2010">
+            </div>
+
+             <div class="input-group">
+              <label class="sub-label">Location Score (1-10)</label>
+              <input type="number" class="f-input" v-model.number="formData.locationScore" min="1" max="10" placeholder="e.g. 8">
+            </div>
+
+            <button class="action-btn-main" @click="runPrediction" :disabled="!isFormValid">
+               Run Prediction
+            </button>
+
+          </div>
+        </div>
+
+        <div class="glass-panel">
+          <div class="panel-head">
+            <span class="panel-label" style="color: var(--aki-primary);">● PREDICTION RESULT</span>
+            <ion-icon name="flash-outline" style="color:#666;"></ion-icon>
+          </div>
+          <div class="panel-content-pad centered-content">
+            
+            <div v-if="!showResults" class="empty-state">
+               <ion-icon name="cube-outline"></ion-icon>
+               <p>Enter details and run prediction to see output</p>
+            </div>
+
+            <div v-else class="result-box">
+               <div class="lbl">ESTIMATED VALUE</div>
+               <div class="val">${{ formatNumber(predictionResult.value) }}</div>
+               
+               <div class="conf-badge">
+                 Confidence: {{ predictionResult.confidence }}%
+               </div>
+               
+               <div class="meta-info">
+                 Model: {{ predictionResult.model }}
+               </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
@@ -103,6 +155,11 @@ export default {
   name: 'PredictView',
   data() {
     return {
+      // Structural State
+      isCollapsed: false,
+      activeTool: 'input-mode',
+
+      // Logic State
       formData: {
         bedrooms: null,
         bathrooms: null,
@@ -118,7 +175,6 @@ export default {
       }
     }
   },
-
   computed: {
     isFormValid() {
       return Object.values(this.formData).every(value => 
@@ -126,18 +182,32 @@ export default {
       )
     }
   },
-
   methods: {
-    runPrediction() {
-      if (!this.isFormValid) {
-        alert('Please fill in all the input fields before running prediction.')
+    // UI Structure Methods
+    toggleSidebar() {
+      this.isCollapsed = !this.isCollapsed
+      if(this.isCollapsed) {
+        this.activeTool = null
+      } else {
+        this.activeTool = 'input-mode'
+      }
+    },
+    toggleTool(toolName) {
+      if(this.isCollapsed) {
+        this.isCollapsed = false
+        setTimeout(() => { this.activeTool = toolName }, 200)
         return
       }
+      this.activeTool = this.activeTool === toolName ? null : toolName
+    },
 
-      // Simulate prediction process
+    // Logic Methods
+    runPrediction() {
+      if (!this.isFormValid) return
+
       this.showResults = false
-
-      // Calculate prediction based on input values
+      
+      // Simulation logic
       const baseValue = 500000
       const bedroomsValue = (this.formData.bedrooms || 0) * 50000
       const bathroomsValue = (this.formData.bathrooms || 0) * 30000
@@ -146,30 +216,17 @@ export default {
       const locationMultiplier = (this.formData.locationScore || 5) * 0.1
 
       const calculatedValue = Math.round(
-        (baseValue + bedroomsValue + bathroomsValue + squareFootageValue - agePenalty) * 
-        (1 + locationMultiplier)
+        (baseValue + bedroomsValue + bathroomsValue + squareFootageValue - agePenalty) * (1 + locationMultiplier)
       )
 
-      // Calculate confidence based on input completeness and validity
-      let confidence = 85 + Math.random() * 10 // Base confidence 85-95%
-      
-      // Adjust confidence based on input values
-      if (this.formData.bedrooms > 0 && this.formData.bedrooms < 10) confidence += 2
-      if (this.formData.bathrooms > 0 && this.formData.bathrooms < 8) confidence += 2
-      if (this.formData.squareFootage > 500 && this.formData.squareFootage < 10000) confidence += 3
-      if (this.formData.yearBuilt > 1900 && this.formData.yearBuilt <= 2024) confidence += 2
-      if (this.formData.locationScore >= 1 && this.formData.locationScore <= 10) confidence += 1
-
-      this.predictionResult = {
-        value: Math.max(calculatedValue, 100000), // Minimum value of $100,000
-        confidence: Math.min(Math.round(confidence), 99), // Maximum 99%
-        model: 'Random Forest v1.0'
-      }
-
-      // Show results after a short delay for better UX
       setTimeout(() => {
+        this.predictionResult = {
+          value: Math.max(calculatedValue, 100000),
+          confidence: 89,
+          model: 'Random Forest v1.0'
+        }
         this.showResults = true
-      }, 500)
+      }, 600)
     },
 
     formatNumber(number) {
@@ -179,342 +236,303 @@ export default {
     goHome() {
       this.$router.push('/')
     }
-  },
-
-  mounted() {
-    // Auto-focus first input for better UX
-    const firstInput = this.$el.querySelector('input[type="number"]')
-    if (firstInput) {
-      firstInput.focus()
-    }
   }
 }
 </script>
 
 <style scoped>
-/* --- THEME VARIABLES --- */
+/* --- DESIGN TOKENS (Exact copy from CleaningView) --- */
 :host {
-  --bg-color: #050505;
-  --card-bg: rgba(24, 24, 27, 0.6);
-  --input-bg: #27272a;
-  --aki-teal: #26a69a;
-  --aki-red: #e53935;
-  --aki-red-glow: rgba(229, 57, 53, 0.5);
-  --text-white: #ffffff;
-  --text-gray: #a1a1aa;
-  --border-color: rgba(255, 255, 255, 0.1);
+  --bg-deep: #050505;
+  --bg-glass: rgba(20, 20, 20, 0.75);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  
+  --aki-primary: #00F0FF; 
+  --aki-primary-dim: rgba(0, 240, 255, 0.08);
+  --aki-danger: #FF2A6D;  
+  
+  --text-main: #ffffff;
+  --text-muted: #888899;
+  
+  --sidebar-width: 280px;
+  --sidebar-collapsed: 70px;
+  --trans-speed: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-* { 
-  margin: 0; 
-  padding: 0; 
-  box-sizing: border-box; 
-  font-family: 'Inter', sans-serif; 
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
 .predict-container {
-  background-color: var(--bg-color);
+  background-color: var(--bg-deep);
   background-image: 
-    radial-gradient(circle at 50% 50%, rgba(38, 166, 154, 0.05), transparent 60%);
-  color: var(--text-white);
+    radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(255, 42, 109, 0.05) 0px, transparent 50%);
+  color: var(--text-main);
   height: 100vh;
   display: flex;
+  overflow: hidden;
+  transition: all var(--trans-speed);
+}
+
+/* ===========================
+   1. SIDEBAR
+=========================== */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border-glass);
+  display: flex;
   flex-direction: column;
+  transition: width var(--trans-speed);
+  position: relative;
+  z-index: 100;
+  padding: 15px 0;
   overflow: hidden;
 }
 
-/* Top Bar */
-.top-bar {
-  padding: 20px 30px; 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center;
-  border-bottom: 1px solid var(--border-color); 
-  background: rgba(5, 5, 5, 0.8); 
-  backdrop-filter: blur(10px);
-}
+.predict-container.collapsed .sidebar { width: var(--sidebar-collapsed); }
+.predict-container.collapsed .hide-on-collapse { opacity: 0; pointer-events: none; display: none; }
 
-.pipeline-stepper { 
-  display: flex; 
-  gap: 2px; 
-  background: #111; 
-  padding: 4px; 
-  border-radius: 8px; 
-  border: 1px solid #333; 
+/* Logo */
+.logo-container {
+  padding: 0 20px 20px 20px;
+  white-space: nowrap;
 }
-.step { 
-  padding: 6px 12px; 
-  border-radius: 6px; 
-  font-size: 0.75rem; 
-  font-weight: 700; 
-  color: #555; 
-  cursor: pointer; 
+.logo-text {
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #fff, #bbb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-.step.active { 
-  background: #222; 
-  color: var(--aki-red); 
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
-}
+.predict-container.collapsed .logo-container { padding: 0 0 20px 0; text-align: center; }
 
-.action-btn { 
-  background: transparent; 
-  border: 1px solid var(--border-color); 
-  padding: 8px; 
-  border-radius: 8px; 
-  color: var(--text-gray); 
-  font-size: 1.2rem; 
-  cursor: pointer; 
-  transition: 0.2s; 
-}
-.action-btn:hover { 
-  border-color: var(--aki-teal); 
-  color: var(--aki-teal); 
-}
-
-/* Main Container */
-.container {
-  flex: 1; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  gap: 40px;
-  padding: 40px; 
-  max-width: 1200px; 
-  margin: 0 auto; 
-  width: 100%;
-}
-
-/* Input Panel */
-.input-panel {
-  flex: 1; 
-  background: var(--card-bg); 
-  border: 1px solid var(--border-color);
-  border-radius: 16px; 
-  padding: 30px; 
-  max-width: 500px; 
-  height: 100%; 
-  max-height: 600px;
-  display: flex; 
+/* Tools Wrapper */
+.tools-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 12px;
+  display: flex;
   flex-direction: column;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  gap: 8px;
 }
 
-.panel-title { 
-  font-size: 1.2rem; 
-  font-weight: 700; 
-  margin-bottom: 20px; 
-  color: white; 
-  border-bottom: 1px solid var(--border-color); 
-  padding-bottom: 15px; 
+.section-title {
+  font-size: 0.65rem;
+  color: #555;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+  padding-left: 4px;
 }
 
-.form-scroll { 
-  overflow-y: auto; 
-  flex: 1; 
-  padding-right: 10px; 
-}
-
-.form-group { 
-  margin-bottom: 15px; 
-}
-.form-group label { 
-  display: block; 
-  font-size: 0.8rem; 
-  color: var(--text-gray); 
-  margin-bottom: 8px; 
-}
-
-.custom-input { 
-  width: 100%; 
-  background: var(--input-bg); 
-  border: 1px solid var(--border-color); 
-  color: white; 
-  padding: 12px; 
-  border-radius: 8px; 
-  outline: none; 
+/* Accordion Item */
+.tool-item {
+  border: 1px solid var(--border-glass);
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  overflow: hidden;
   transition: 0.2s;
-  font-size: 0.9rem;
-}
-.custom-input:focus { 
-  border-color: var(--aki-teal); 
-  box-shadow: 0 0 10px rgba(38, 166, 154, 0.2);
-}
-.custom-input::placeholder {
-  color: #666;
 }
 
-.predict-btn {
-  width: 100%; 
-  padding: 15px; 
-  background: var(--aki-teal); 
-  color: white; 
-  border: none; 
-  border-radius: 8px; 
-  font-weight: 700; 
-  cursor: pointer; 
-  margin-top: 20px; 
-  font-size: 1rem;
-  box-shadow: 0 0 20px rgba(38, 166, 154, 0.4); 
-  transition: 0.3s;
+.tool-header {
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #aaa;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: 0.2s;
+  min-height: 45px;
+}
+
+.tool-header ion-icon { font-size: 1rem; color: var(--aki-primary); flex-shrink: 0; }
+.tool-item:hover { background: rgba(255,255,255,0.05); }
+.tool-item.active { border-color: rgba(0, 240, 255, 0.4); background: var(--aki-primary-dim); }
+.tool-item.active .tool-header { color: white; }
+
+.predict-container.collapsed .tool-header { justify-content: center; padding: 12px 0; }
+.predict-container.collapsed .tool-label, .predict-container.collapsed .chevron { display: none; }
+
+/* Tool Content Form */
+.tool-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: rgba(0,0,0,0.3);
+}
+.tool-item.active .tool-content { border-top: 1px solid rgba(255,255,255,0.05); }
+
+.form-pad { padding: 15px 12px; }
+
+/* Custom Options in Sidebar */
+.model-option {
+  padding: 8px; border-radius: 4px; cursor: pointer; color: #888;
+  display: flex; align-items: center; gap: 10px; font-size: 0.75rem;
+  transition: 0.2s; margin-bottom: 4px;
+}
+.model-option:hover { background: rgba(255,255,255,0.05); color: white; }
+.model-option.selected { background: var(--aki-primary-dim); color: var(--aki-primary); border: 1px solid rgba(0,240,255,0.2); }
+
+/* Sidebar Footer */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 15px 12px;
+  border-top: 1px solid var(--border-glass);
+}
+.nav-finish {
+  width: 100%;
+  background: #666; /* Grey for finish/home */
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: 0.2s;
 }
-.predict-btn:hover:not(:disabled) { 
-  transform: translateY(-2px); 
-  box-shadow: 0 0 30px rgba(38, 166, 154, 0.6); 
-}
-.predict-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
+.nav-finish:hover { background: #888; }
+.predict-container.collapsed .nav-finish span { display: none; }
 
-/* Result Panel */
-.result-panel {
-  flex: 1; 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  justify-content: center;
-  text-align: center; 
-  max-width: 400px;
-}
-
-.empty-state {
-  color: var(--text-gray); 
-  font-size: 0.9rem; 
-  border: 2px dashed var(--border-color);
-  padding: 40px; 
-  border-radius: 20px; 
-  width: 100%;
-  text-align: center;
-}
-
-.result-card {
-  background: rgba(20, 20, 20, 0.8); 
-  border: 1px solid var(--border-color); 
-  padding: 40px;
-  border-radius: 20px; 
-  width: 100%; 
-  position: relative; 
+/* ===========================
+   2. MAIN VIEW
+=========================== */
+.main-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
   overflow: hidden;
-  display: none;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-.result-card.show { 
-  display: block; 
-  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 }
 
-@keyframes popIn {
-  0% { 
-    opacity: 0; 
-    transform: scale(0.8); 
-  }
-  100% { 
-    opacity: 1; 
-    transform: scale(1); 
-  }
+.top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 30px;
+  border-bottom: 1px solid var(--border-glass);
+  position: relative; 
 }
 
-.prediction-value { 
-  font-size: 3rem; 
-  font-weight: 800; 
-  color: var(--aki-teal); 
-  margin: 10px 0; 
-  text-shadow: 0 0 20px rgba(38, 166, 154, 0.3);
+.header-left { display: flex; align-items: center; gap: 20px; z-index: 2; }
+.header-right { display: flex; align-items: center; gap: 15px; z-index: 2; }
+
+/* === HEADER CENTER (PIPELINE) === */
+.header-center {
+  position: absolute;
+  left: 42%;
+  transform: translateX(-50%);
+  z-index: 1;
 }
 
-.confidence { 
-  font-size: 0.9rem; 
-  color: var(--text-gray); 
-  background: rgba(255,255,255,0.05); 
-  padding: 5px 10px; 
-  border-radius: 20px; 
-  display: inline-block; 
-  border: 1px solid rgba(255,255,255,0.1);
+.menu-toggle {
+  background: transparent; border: none; color: white;
+  font-size: 1.6rem; cursor: pointer; display: flex;
+}
+.menu-toggle:hover { color: var(--aki-primary); }
+
+.pipeline {
+  display: flex; gap: 4px; background: #0a0a0a;
+  padding: 4px; border-radius: 50px; border: 1px solid #222;
+}
+.step {
+  padding: 5px 14px; border-radius: 40px; font-size: 0.7rem;
+  font-weight: 600; color: #555; cursor: default;
+}
+.step.active {
+  background: #1f1f1f; color: var(--aki-primary); border: 1px solid #333;
 }
 
-/* Custom Scrollbar */
-.form-scroll::-webkit-scrollbar {
-  width: 6px;
+.top-nav-btn {
+  background: transparent;
+  border: 1px solid var(--border-glass);
+  color: #aaa;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  transition: 0.2s;
+}
+.top-nav-btn:hover { border-color: #666; color: white; background: rgba(255,255,255,0.05); }
+.top-nav-btn.logout:hover { border-color: var(--aki-danger); color: var(--aki-danger); }
+
+.user-avatar { font-size: 1.8rem; color: #444; display: flex; align-items: center; }
+
+/* === CONTENT GRID === */
+.content-grid {
+  flex: 1;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  overflow: hidden;
 }
 
-.form-scroll::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+.glass-panel {
+  background: rgba(15, 15, 17, 0.6);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
+.panel-head {
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border-glass);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.panel-label { font-size: 0.8rem; font-weight: 700; color: #ddd; letter-spacing: 0.5px; }
+.panel-content-pad { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+.centered-content { align-items: center; justify-content: center; }
 
-.form-scroll::-webkit-scrollbar-thumb {
-  background: rgba(38, 166, 154, 0.5);
-  border-radius: 3px;
+/* Form Elements */
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+.sub-label { font-size: 0.75rem; color: #999; font-weight: 500; }
+.f-input {
+  background: rgba(0,0,0,0.3); border: 1px solid #333; color: white;
+  padding: 10px; border-radius: 6px; outline: none; font-size: 0.8rem;
 }
+.f-input:focus { border-color: var(--aki-primary); }
 
-.form-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(38, 166, 154, 0.7);
+.action-btn-main {
+  margin-top: 20px; width: 100%; background: var(--aki-primary); color: #000; border: none;
+  padding: 12px; border-radius: 6px; font-weight: 700; cursor: pointer;
+  transition: 0.2s;
 }
+.action-btn-main:hover:not(:disabled) { box-shadow: 0 0 15px var(--aki-primary-dim); transform: translateY(-1px); }
+.action-btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .container {
-    flex-direction: column;
-    gap: 30px;
-  }
-  
-  .input-panel,
-  .result-panel {
-    max-width: 100%;
-    width: 100%;
-  }
-  
-  .input-panel {
-    max-height: 400px;
-  }
-}
+/* Result Elements */
+.empty-state { text-align: center; color: #555; font-size: 0.8rem; }
+.empty-state ion-icon { font-size: 3rem; margin-bottom: 10px; opacity: 0.3; }
 
-@media (max-width: 768px) {
-  .top-bar {
-    padding: 15px 20px;
-  }
-  
-  .container {
-    padding: 20px;
-  }
-  
-  .input-panel,
-  .result-panel {
-    padding: 20px;
-  }
-  
-  .prediction-value {
-    font-size: 2.5rem;
-  }
-  
-  .pipeline-stepper {
-    display: none;
-  }
-}
+.result-box { text-align: center; animation: popIn 0.4s ease; }
+@keyframes popIn { 0% { opacity:0; transform: scale(0.9); } 100% { opacity:1; transform: scale(1); } }
 
-@media (max-width: 480px) {
-  .top-bar {
-    padding: 10px 15px;
-  }
-  
-  .container {
-    padding: 15px;
-  }
-  
-  .prediction-value {
-    font-size: 2rem;
-  }
-  
-  .input-panel,
-  .result-panel {
-    padding: 15px;
-  }
+.lbl { font-size: 0.75rem; color: #888; letter-spacing: 2px; margin-bottom: 10px; }
+.val { font-size: 3rem; font-weight: 800; color: var(--aki-primary); text-shadow: 0 0 20px var(--aki-primary-dim); }
+.conf-badge {
+  display: inline-block; background: rgba(255,255,255,0.05); border: 1px solid #333;
+  padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; color: #aaa; margin: 15px 0;
 }
+.meta-info { font-size: 0.7rem; color: #555; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
 </style>

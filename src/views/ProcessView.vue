@@ -1,68 +1,116 @@
 <template>
-  <div class="process-container" :class="{ 'sidebar-closed': isSidebarClosed }">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="mainSidebar">
-      <div class="sidebar-header">
-        <div class="brand-text">AKI <span style="color:var(--aki-red)">DataSuite</span></div>
+  <div class="process-container" :class="{ collapsed: isCollapsed }">
+    
+    <nav class="sidebar" id="sidebar">
+      <div class="logo-container">
+        <ion-icon name="analytics-outline" style="font-size: 1.5rem; color: var(--aki-primary); vertical-align: middle;"></ion-icon>
+        <span class="logo-text hide-on-collapse" style="margin-left: 10px;">AKI DATA PROCESS</span>
       </div>
 
-      <div class="sidebar-content">
-        <div class="op-item" :class="{ active: activeOperation === 'rename' }" @click="setActiveOperation('rename')">
-          <span>Rename Columns</span>
-          <ion-icon name="text-outline"></ion-icon>
+      <div class="tools-wrapper">
+        <div class="section-title hide-on-collapse">PROCESSING TOOLS</div>
+
+        <div class="tool-item" :class="{ active: activeTool === 'rename' }">
+          <div class="tool-header" @click="toggleTool('rename')">
+            <ion-icon name="text-outline"></ion-icon>
+            <span class="tool-label">Rename Columns</span>
+            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+          </div>
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'rename' ? '500px' : '0' }">
+            <div class="form-pad hide-on-collapse">
+              <label class="sub-label">Column Configuration</label>
+              <div class="placeholder-box">
+                [Rename Settings Placeholder]
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-item" :class="{ active: activeTool === 'null-handling' }">
+          <div class="tool-header" @click="toggleTool('null-handling')">
+            <ion-icon name="water-outline"></ion-icon>
+            <span class="tool-label">Null Handling</span>
+            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+          </div>
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'null-handling' ? '500px' : '0' }">
+            <div class="form-pad hide-on-collapse">
+              <label class="sub-label">Imputation Method</label>
+              <div class="placeholder-box">
+                [Null Handling Settings]
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-item" :class="{ active: activeTool === 'outlier' }">
+          <div class="tool-header" @click="toggleTool('outlier')">
+            <ion-icon name="trending-up-outline"></ion-icon>
+            <span class="tool-label">Outlier Detection</span>
+            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+          </div>
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'outlier' ? '500px' : '0' }">
+            <div class="form-pad hide-on-collapse">
+               <label class="sub-label">Threshold Settings</label>
+               <div class="placeholder-box">
+                [Outlier Logic Placeholder]
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-item" :class="{ active: activeTool === 'smote' }">
+          <div class="tool-header" @click="toggleTool('smote')">
+            <ion-icon name="duplicate-outline"></ion-icon>
+            <span class="tool-label">SMOTE</span>
+            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+          </div>
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'smote' ? '500px' : '0' }">
+            <div class="form-pad hide-on-collapse">
+               <label class="sub-label">Oversampling Config</label>
+               <div class="placeholder-box">
+                [SMOTE Settings]
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div class="op-item" :class="{ active: activeOperation === 'null-handling' }" @click="setActiveOperation('null-handling')">
-          <span>Null Handling</span>
-          <ion-icon name="water-outline"></ion-icon>
-        </div>
-        
-        <div class="op-item" :class="{ active: activeOperation === 'null-handle-cat' }" @click="setActiveOperation('null-handle-cat')">
-          <span>Null Handle (Cat)</span>
-          <ion-icon name="list-outline"></ion-icon>
-        </div>
-
-        <div class="op-item" :class="{ active: activeOperation === 'outlier-detection' }" @click="setActiveOperation('outlier-detection')">
-          <span>Outlier Detection</span>
-          <ion-icon name="trending-up-outline"></ion-icon>
-        </div>
-
-        <div class="op-item" :class="{ active: activeOperation === 'smote' }" @click="setActiveOperation('smote')">
-          <span>SMOTE</span>
-          <ion-icon name="duplicate-outline"></ion-icon>
+        <div class="tool-item" :class="{ active: activeTool === 'feature' }">
+          <div class="tool-header" @click="toggleTool('feature')">
+            <ion-icon name="construct-outline"></ion-icon>
+            <span class="tool-label">Feature Eng.</span>
+            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+          </div>
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'feature' ? '500px' : '0' }">
+            <div class="form-pad hide-on-collapse">
+               <label class="sub-label">New Feature Logic</label>
+               <div class="placeholder-box">
+                [Feature Builder]
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="op-item" :class="{ active: activeOperation === 'encoding' }" @click="setActiveOperation('encoding')">
-          <span>Encoding</span>
-          <ion-icon name="code-slash-outline"></ion-icon>
-        </div>
-
-        <div class="op-item" :class="{ active: activeOperation === 'feature-engineering' }" @click="setActiveOperation('feature-engineering')">
-          <span>Feature Engineering</span>
-          <ion-icon name="construct-outline"></ion-icon>
-        </div>
       </div>
 
       <div class="sidebar-footer">
-        <button class="btn-prev" @click="goToFiltering">
-          Back
-        </button>
-        <button class="btn-next" @click="goToNext">
-          Next Step <ion-icon name="arrow-forward-outline"></ion-icon>
+        <button class="nav-btn nav-next" @click="goToTraining">
+          <span>NEXT STEP</span>
+          <ion-icon name="arrow-forward-outline"></ion-icon>
         </button>
       </div>
-    </aside>
+    </nav>
 
-    <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-view">
       
-      <div class="top-bar">
-        <div class="left-controls">
-          <div class="menu-toggle" @click="toggleSidebar">
+      <header class="top-header">
+        <div class="header-left">
+          <button class="menu-toggle" @click="toggleSidebar">
             <ion-icon name="menu-outline"></ion-icon>
-          </div>
+          </button>
+        </div>
 
-          <div class="pipeline-stepper">
+        <div class="header-center">
+          <div class="pipeline">
             <div class="step">CLEAN</div>
             <div class="step">FILTER</div>
             <div class="step active">PROCESS</div>
@@ -71,86 +119,73 @@
           </div>
         </div>
 
-        <div class="user-actions">
-          <button class="action-btn" title="Home" @click="goHome">
+        <div class="header-right">
+          <button class="top-nav-btn" @click="goHome">
             <ion-icon name="home-outline"></ion-icon>
+            <span>Home</span>
           </button>
-          <button class="action-btn" title="Logout">
-            <ion-icon name="log-out-outline"></ion-icon>
-          </button>
-        </div>
-      </div>
-
-      <div class="comparison-grid">
-        
-        <div class="panel">
-          <div class="panel-header">
-            <span class="panel-title"><span class="dot yellow"></span> Configuration</span>
-            <div class="sub-tabs">
-              <span style="font-size: 0.75rem; color: var(--text-gray);">Target: Price</span>
-            </div>
-          </div>
           
-          <div class="chart-controls">
-            <button 
-              v-for="chartType in chartTypes" 
-              :key="chartType"
-              class="chart-btn"
-              :class="{ active: selectedChartType === chartType }"
-              @click="selectChartType(chartType)"
-            >
-              {{ chartType }}
-            </button>
+          <button class="top-nav-btn logout">
+            <ion-icon name="log-out-outline"></ion-icon>
+            <span>Logout</span>
+          </button>
+          
+          <div class="user-avatar">
+            <ion-icon name="person-circle-outline"></ion-icon>
           </div>
+        </div>
+      </header>
 
-          <div class="dropdown-grid">
-            <div class="form-group">
-              <label>Feature (X)</label>
-              <select class="custom-select" v-model="selectedFeature">
-                <option v-for="feature in features" :key="feature" :value="feature">
-                  {{ feature }}
-                </option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Value (Y)</label>
-              <select class="custom-select" v-model="selectedValue">
-                <option v-for="value in values" :key="value" :value="value">
-                  {{ value }}
-                </option>
-              </select>
-            </div>
+      <div class="content-grid">
+        
+        <div class="glass-panel">
+          <div class="panel-head">
+            <span class="panel-label" style="color: #ffcc00;">● CONFIGURATION</span>
+            <ion-icon name="settings-outline" style="color:#666;"></ion-icon>
           </div>
+          <div class="panel-content-pad">
+             <div class="chart-controls-wrapper">
+                <div class="chart-buttons">
+                  <button 
+                    v-for="chartType in chartTypes" 
+                    :key="chartType"
+                    class="mini-btn"
+                    :class="{ active: selectedChartType === chartType }"
+                    @click="selectChartType(chartType)"
+                  >
+                    {{ chartType }}
+                  </button>
+                </div>
 
-          <div class="chart-area">
-            <div class="chart-bg"></div>
-            <ion-icon :name="getChartIcon()"></ion-icon>
-            <span>{{ getChartTitle() }}</span>
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>Feature (X)</label>
+                    <select class="f-input" v-model="selectedFeature">
+                      <option v-for="feature in features" :key="feature" :value="feature">{{ feature }}</option>
+                    </select>
+                  </div>
+                  <div class="input-group-mini">
+                     <label>Value (Y)</label>
+                    <select class="f-input" v-model="selectedValue">
+                       <option v-for="value in values" :key="value" :value="value">{{ value }}</option>
+                    </select>
+                  </div>
+                </div>
+             </div>
+
+             <div class="chart-display-area">
+                <ion-icon :name="getChartIcon()"></ion-icon>
+                <span>{{ selectedChartType }} Chart Preview</span>
+             </div>
           </div>
         </div>
 
-        <div class="panel">
-          <div class="panel-header">
-            <span class="panel-title"><span class="dot green"></span> Processed Data</span>
-            <div class="sub-tabs">
-              <span 
-                style="color: var(--aki-teal); font-weight: 700; font-size:0.75rem; cursor:pointer;"
-                :class="{ active: activeSubTab === 'preview' }"
-                @click="setActiveSubTab('preview')"
-              >Preview</span>
-              <span 
-                style="color: var(--text-gray); font-size:0.75rem; margin-left:15px; cursor:pointer;"
-                :class="{ active: activeSubTab === 'stats' }"
-                @click="setActiveSubTab('stats')"
-              >Stats</span>
-              <span 
-                style="color: var(--text-gray); font-size:0.75rem; margin-left:15px; cursor:pointer;"
-                :class="{ active: activeSubTab === 'info' }"
-                @click="setActiveSubTab('info')"
-              >Info</span>
-            </div>
+        <div class="glass-panel">
+          <div class="panel-head">
+            <span class="panel-label" style="color: var(--aki-primary);">● PROCESSED DATA</span>
+            <ion-icon name="download-outline" style="color:#666; cursor: pointer;"></ion-icon>
           </div>
-          <div class="table-scroll-area">
+          <div class="table-wrap">
             <table id="table-processed">
               <thead>
                 <tr>
@@ -165,7 +200,7 @@
               </thead>
               <tbody>
                 <tr v-for="(row, index) in processedData" :key="index">
-                  <td v-for="(cell, cellIndex) in row" :key="cellIndex" :class="getCellClass(cell, cellIndex)">
+                   <td v-for="(cell, cellIndex) in row" :key="cellIndex" :class="getCellClass(cell, cellIndex)">
                     {{ formatCellValue(cell, cellIndex) }}
                   </td>
                 </tr>
@@ -184,15 +219,19 @@ export default {
   name: 'ProcessView',
   data() {
     return {
-      isSidebarClosed: false,
-      activeOperation: 'null-handling',
+      // Structural state (Matches CleaningView)
+      isCollapsed: false,
+      activeTool: 'null-handling', // Default open tool
+
+      // Logic State (Preserved from ProcessView)
       selectedChartType: 'Pie',
       chartTypes: ['Pie', 'Box', 'Scatter', 'Violin', 'Line', 'Hist'],
       selectedFeature: 'Transaction ID',
       features: ['Transaction ID', 'Item Category', 'Payment Method'],
       selectedValue: 'Count',
       values: ['Count', 'Sum', 'Average'],
-      activeSubTab: 'preview',
+
+      // Data
       processedData: [
         ['0', 'TXN_1961373', 'None', 2, 2, 4, 'Credit Card'],
         ['1', 'TXN_4977031', 'None', 4, 3, 12, 'Cash'],
@@ -210,20 +249,28 @@ export default {
     }
   },
   methods: {
+    // UI Structure Methods
     toggleSidebar() {
-      this.isSidebarClosed = !this.isSidebarClosed
+      this.isCollapsed = !this.isCollapsed
+      if(this.isCollapsed) {
+        this.activeTool = null
+      } else {
+        this.activeTool = 'null-handling'
+      }
     },
 
-    setActiveOperation(operation) {
-      this.activeOperation = operation
+    toggleTool(toolName) {
+      if(this.isCollapsed) {
+        this.isCollapsed = false
+        setTimeout(() => { this.activeTool = toolName }, 200)
+        return
+      }
+      this.activeTool = this.activeTool === toolName ? null : toolName
     },
 
-    selectChartType(chartType) {
-      this.selectedChartType = chartType
-    },
-
-    setActiveSubTab(tab) {
-      this.activeSubTab = tab
+    // Logic Methods
+    selectChartType(type) {
+      this.selectedChartType = type
     },
 
     getChartIcon() {
@@ -238,361 +285,338 @@ export default {
       return iconMap[this.selectedChartType] || 'pie-chart-outline'
     },
 
-    getChartTitle() {
-      return `${this.selectedChartType} Chart Preview`
-    },
-
     formatCellValue(cell, cellIndex) {
-      // Specific styling logic from original HTML
-      if (cellIndex === 0) return cell // ID column
-      if (cellIndex === 1) return cell // Transaction ID
-      if (cell === 'None') return cell // Null values
+      if (cellIndex === 0) return cell 
+      if (cellIndex === 1) return cell 
+      if (cell === 'None') return cell 
       return cell
     },
 
     getCellClass(cell, cellIndex) {
       const classes = []
-      if (cellIndex === 0) classes.push('id-column') // ID column
-      if (cellIndex === 1) classes.push('transaction-id') // Transaction ID (Red)
-      if (cell === 'None') classes.push('null-value') // Null values
+      if (cellIndex === 0) classes.push('id-column') 
+      if (cellIndex === 1) classes.push('transaction-id') 
+      if (cell === 'None') classes.push('null-value') 
       return classes
     },
 
-    goToFiltering() {
-      this.$router.push('/filtering')
-    },
-
-    goToNext() {
-      // Navigate to training step (next after processing)
-      this.$router.push('/training')
-    },
-
+    // Navigation
     goHome() {
       this.$router.push('/')
+    },
+
+    goToTraining() {
+      this.$router.push('/training')
     }
   }
 }
 </script>
 
 <style scoped>
-/* --- THEME VARIABLES (MATCHING FILTERING.HTML) --- */
+/* --- DESIGN TOKENS (Exact copy from CleaningView) --- */
 :host {
-  --bg-color: #050505;
-  --sidebar-bg: rgba(18, 18, 18, 0.85);
-  --card-bg: rgba(24, 24, 27, 0.6);
-  --input-bg: #27272a;
+  --bg-deep: #050505;
+  --bg-glass: rgba(20, 20, 20, 0.75);
+  --border-glass: rgba(255, 255, 255, 0.08);
   
-  --aki-teal: #26a69a;
-  --aki-red: #e53935;
-  --aki-red-glow: rgba(229, 57, 53, 0.5);
-  --aki-teal-glow: rgba(38, 166, 154, 0.3);
+  --aki-primary: #00F0FF; 
+  --aki-primary-dim: rgba(0, 240, 255, 0.08);
+  --aki-danger: #FF2A6D;  
   
-  --text-white: #ffffff;
-  --text-gray: #a1a1aa;
-  --border-color: rgba(255, 255, 255, 0.1);
+  --text-main: #ffffff;
+  --text-muted: #888899;
   
-  --sidebar-width: 340px;
-  --transition-speed: 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  --sidebar-width: 280px;
+  --sidebar-collapsed: 70px;
+  --trans-speed: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
+/* Renamed root class */
 .process-container {
-  background-color: var(--bg-color);
+  background-color: var(--bg-deep);
   background-image: 
-    radial-gradient(circle at 0% 0%, rgba(38, 166, 154, 0.08), transparent 40%),
-    radial-gradient(circle at 100% 100%, rgba(229, 57, 53, 0.08), transparent 40%);
-  color: var(--text-white);
+    radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(255, 42, 109, 0.05) 0px, transparent 50%);
+  color: var(--text-main);
   height: 100vh;
   display: flex;
   overflow: hidden;
+  transition: all var(--trans-speed);
 }
 
 /* ===========================
-   1. SIDEBAR (Collapsible)
+   1. SIDEBAR
 =========================== */
 .sidebar {
   width: var(--sidebar-width);
-  background-color: var(--sidebar-bg);
-  border-right: 1px solid var(--border-color);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border-glass);
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  z-index: 100;
-  backdrop-filter: blur(15px);
-  transition: transform var(--transition-speed), width var(--transition-speed);
+  transition: width var(--trans-speed);
   position: relative;
-  flex-shrink: 0;
+  z-index: 100;
+  padding: 15px 0;
+  overflow: hidden;
 }
 
-/* Collapsed State Class */
-.process-container.sidebar-closed .sidebar {
-  margin-left: calc(var(--sidebar-width) * -1);
-}
+.process-container.collapsed .sidebar { width: var(--sidebar-collapsed); }
+.process-container.collapsed .hide-on-collapse { opacity: 0; pointer-events: none; display: none; }
 
-/* Sidebar Header */
-.sidebar-header {
-  padding: 25px;
-  border-bottom: 1px solid var(--border-color);
+/* Logo */
+.logo-container {
+  padding: 0 20px 20px 20px;
+  white-space: nowrap;
 }
-
-.brand-text {
+.logo-text {
   font-weight: 800;
-  font-size: 1.1rem;
+  font-size: 0.85rem;
   letter-spacing: 1px;
-  text-transform: uppercase;
-  background: linear-gradient(90deg, #fff, var(--text-gray));
+  background: linear-gradient(90deg, #fff, #bbb);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+.process-container.collapsed .logo-container { padding: 0 0 20px 0; text-align: center; }
 
-/* Sidebar Scrollable Area */
-.sidebar-content {
+/* Tools Wrapper */
+.tools-wrapper {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  overflow-x: hidden;
+  padding: 0 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
-/* Operations Menu Items */
-.op-item {
+.section-title {
+  font-size: 0.65rem;
+  color: #555;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+  padding-left: 4px;
+}
+
+/* Accordion Item */
+.tool-item {
+  border: 1px solid var(--border-glass);
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: 0.2s;
+}
+
+.tool-header {
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #aaa;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: 0.2s;
+  min-height: 45px;
+}
+
+.tool-header ion-icon { font-size: 1rem; color: var(--aki-primary); flex-shrink: 0; }
+.tool-item:hover { background: rgba(255,255,255,0.05); }
+.tool-item.active { border-color: rgba(0, 240, 255, 0.4); background: var(--aki-primary-dim); }
+.tool-item.active .tool-header { color: white; }
+
+.process-container.collapsed .tool-header { justify-content: center; padding: 12px 0; }
+.process-container.collapsed .tool-label, .process-container.collapsed .chevron { display: none; }
+
+/* Tool Content Form */
+.tool-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: rgba(0,0,0,0.3);
+}
+.tool-item.active .tool-content { border-top: 1px solid rgba(255,255,255,0.05); }
+
+.form-pad { padding: 15px 12px; }
+.placeholder-box {
+  padding: 10px; border: 1px dashed #444; border-radius: 6px; 
+  text-align: center; color: #666; font-size: 0.7rem;
+}
+
+/* --- INPUTS & LABELS --- */
+.sub-label { 
+  display: block; 
+  font-size: 0.75rem; 
+  color: #e0e0e0; 
+  margin-bottom: 6px; 
+  font-weight: 500;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 15px 12px;
+  border-top: 1px solid var(--border-glass);
+}
+.nav-next {
+  width: 100%;
+  background: var(--aki-danger);
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(255, 42, 109, 0.2);
+  transition: 0.2s;
+}
+.nav-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 42, 109, 0.4); }
+.process-container.collapsed .nav-next span { display: none; }
+
+/* ===========================
+   2. MAIN VIEW
+=========================== */
+.main-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.top-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-color);
-  padding: 14px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.2s;
-  color: var(--text-gray);
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-.op-item:hover, .op-item.active {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--aki-red);
-  color: white;
-  transform: translateX(5px);
-}
-.op-item ion-icon { font-size: 1.1rem; }
-
-/* Sidebar Footer (Sticky Buttons) */
-.sidebar-footer {
-  padding: 20px;
-  background: rgba(0,0,0,0.4);
-  border-top: 1px solid var(--border-color);
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 10px;
+  padding: 15px 30px;
+  border-bottom: 1px solid var(--border-glass);
+  position: relative; 
 }
 
-.btn-prev, .btn-next {
-  padding: 12px;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: var(--transition-speed);
-  border: 1px solid transparent;
+.header-left { display: flex; align-items: center; gap: 20px; z-index: 2; }
+.header-right { display: flex; align-items: center; gap: 15px; z-index: 2; }
+
+/* === HEADER CENTER (PIPELINE) === */
+.header-center {
+  position: absolute;
+  left: 42%; /* MOVED LEFT from 50% */
+  transform: translateX(-50%);
+  z-index: 1;
 }
 
-.btn-prev {
-  background: transparent;
-  border-color: var(--border-color);
-  color: var(--text-gray);
-}
-.btn-prev:hover { border-color: white; color: white; }
-
-.btn-next {
-  background: var(--aki-red);
-  color: white;
-  box-shadow: 0 0 15px var(--aki-red-glow);
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.btn-next:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--aki-red-glow); }
-
-
-/* ===========================
-   2. MAIN CONTENT
-=========================== */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-}
-
-/* Top Bar */
-.top-bar {
-  padding: 20px 30px;
-  display: flex; justify-content: space-between; align-items: center;
-  border-bottom: 1px solid var(--border-color);
-  background: rgba(5, 5, 5, 0.6);
-  backdrop-filter: blur(10px);
-}
-
-.left-controls { display: flex; align-items: center; gap: 20px; }
-
-/* HAMBURGER MENU */
 .menu-toggle {
-  font-size: 1.8rem; cursor: pointer; color: white;
-  transition: 0.2s;
-  background: transparent;
-  border: none;
+  background: transparent; border: none; color: white;
+  font-size: 1.6rem; cursor: pointer; display: flex;
 }
-.menu-toggle:hover { color: var(--aki-teal); }
+.menu-toggle:hover { color: var(--aki-primary); }
 
-/* Pipeline Stepper */
-.pipeline-stepper {
-  display: flex; gap: 2px;
-  background: #111; padding: 4px; border-radius: 8px; border: 1px solid #333;
+.pipeline {
+  display: flex; gap: 4px; background: #0a0a0a;
+  padding: 4px; border-radius: 50px; border: 1px solid #222;
 }
 .step {
-  padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
-  color: #555; cursor: pointer; transition: 0.3s;
+  padding: 5px 14px; border-radius: 40px; font-size: 0.7rem;
+  font-weight: 600; color: #555; cursor: default;
 }
-.step:hover { color: #888; }
 .step.active {
-  background: #222; color: var(--aki-red);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  background: #1f1f1f; color: var(--aki-primary); border: 1px solid #333;
 }
 
-.user-actions { display: flex; gap: 15px; }
-.action-btn {
-  background: transparent; border: 1px solid var(--border-color);
-  padding: 8px; border-radius: 8px; color: var(--text-gray);
-  font-size: 1.2rem; cursor: pointer; transition: 0.3s;
-}
-.action-btn:hover { border-color: var(--aki-teal); color: var(--aki-teal); }
-
-
-/* Panels */
-.comparison-grid {
-  display: grid; grid-template-columns: 40% 60%; /* Adjusted split for chart vs table */
-  gap: 25px;
-  padding: 25px;
-  flex: 1; height: 100%; overflow: hidden;
-}
-
-.panel {
-  display: flex; flex-direction: column;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  overflow: hidden;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.panel-header {
-  background: rgba(255,255,255,0.02); padding: 15px;
-  display: flex; justify-content: space-between; align-items: center;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.panel-title { font-weight: 600; font-size: 0.9rem; color: #fff; display: flex; align-items: center; gap: 8px;}
-.dot { width: 8px; height: 8px; border-radius: 50%; }
-.dot.yellow { background: #ffca28; box-shadow: 0 0 8px rgba(255,202,40, 0.4); }
-.dot.green { background: #66bb6a; box-shadow: 0 0 8px rgba(102,187,106, 0.4); }
-
-/* --- PREPROCESSING SPECIFIC STYLES --- */
-
-/* Chart Controls */
-.chart-controls {
-  padding: 15px;
-  border-bottom: 1px solid var(--border-color);
-  display: flex; flex-wrap: wrap; gap: 8px;
-}
-.chart-btn {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border-color);
-  padding: 6px 12px;
-  border-radius: 4px;
-  color: var(--text-gray);
-  font-size: 0.75rem;
+.top-nav-btn {
+  background: transparent;
+  border: 1px solid var(--border-glass);
+  color: #aaa;
+  padding: 6px 14px;
+  border-radius: 20px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
   transition: 0.2s;
 }
-.chart-btn:hover, .chart-btn.active {
-  background: var(--aki-red-glow);
-  border-color: var(--aki-red);
-  color: white;
-}
+.top-nav-btn:hover { border-color: #666; color: white; background: rgba(255,255,255,0.05); }
+.top-nav-btn.logout:hover { border-color: var(--aki-danger); color: var(--aki-danger); }
 
-.dropdown-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-  padding: 15px;
-}
-.form-group label {
-  display: block; font-size: 0.7rem; color: var(--text-gray); margin-bottom: 5px;
-}
-.custom-select {
-  width: 100%;
-  background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  color: white;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  outline: none;
-}
-.custom-select:focus { border-color: var(--aki-teal); }
+.user-avatar { font-size: 1.8rem; color: #444; display: flex; align-items: center; }
 
-/* Chart Area */
-.chart-area {
+.content-grid {
   flex: 1;
-  margin: 15px;
-  background: rgba(0,0,0,0.2);
-  border-radius: 12px;
-  border: 1px dashed var(--border-color);
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column;
-  color: var(--text-gray);
-  position: relative;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
   overflow: hidden;
 }
-.chart-area ion-icon { font-size: 3rem; margin-bottom: 10px; opacity: 0.5; }
 
-/* Decorative chart background */
-.chart-bg {
-  position: absolute; bottom: 0; left: 0; width: 100%; height: 60%;
-  background: linear-gradient(0deg, rgba(229,57,53,0.1) 0%, transparent 100%);
-  z-index: 0; pointer-events: none;
+.glass-panel {
+  background: rgba(15, 15, 17, 0.6);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-head {
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border-glass);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.panel-label { font-size: 0.8rem; font-weight: 700; color: #ddd; letter-spacing: 0.5px; }
+.panel-content-pad { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+
+/* Internal Chart Controls (Styled minimally to fit new theme) */
+.chart-controls-wrapper {
+  display: flex; flex-direction: column; gap: 15px;
+  padding-bottom: 15px; border-bottom: 1px solid var(--border-glass);
+}
+.chart-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+.mini-btn {
+  background: rgba(255,255,255,0.05); border: 1px solid #333; color: #999;
+  padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.7rem;
+}
+.mini-btn.active, .mini-btn:hover { background: var(--aki-primary-dim); color: var(--aki-primary); border-color: var(--aki-primary); }
+
+.inputs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.input-group-mini label { display: block; font-size: 0.7rem; color: #777; margin-bottom: 4px; }
+.f-input {
+  width: 100%; background: rgba(0,0,0,0.3); border: 1px solid #333;
+  color: #ccc; padding: 8px; border-radius: 4px; font-size: 0.75rem;
 }
 
-/* Table Area */
-.table-scroll-area { overflow: auto; flex: 1; }
+.chart-display-area {
+  flex: 1; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px dashed #333;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #555; gap: 10px;
+}
+.chart-display-area ion-icon { font-size: 3rem; opacity: 0.5; }
 
-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; white-space: nowrap; }
+.table-wrap { flex: 1; overflow: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.75rem; white-space: nowrap; }
 thead th {
-  position: sticky; top: 0; background: rgba(20,20,20,0.95); z-index: 5;
-  padding: 14px; text-align: left; color: var(--text-gray); font-weight: 600;
-  border-bottom: 1px solid var(--border-color);
+  position: sticky; top: 0; background: #141414; color: #777;
+  text-align: left; padding: 10px 16px; font-weight: 600;
+  border-bottom: 1px solid #333; z-index: 5;
 }
-tbody td {
-  padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); color: #ddd;
-}
-tbody tr:hover { background: rgba(229, 57, 53, 0.05); } /* Red hover tint for Preprocessing */
+tbody td { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); color: #ccc; }
+tbody tr:hover { background: rgba(0, 240, 255, 0.03); }
 
-/* Cell specific styling */
-.id-column { color: #666; }
-.transaction-id { color: #e53935; }
+/* Specific Colors preserved from logic */
+.transaction-id { color: var(--aki-danger); }
 .null-value { font-style: italic; color: #555; }
 
-/* Sub tabs */
-.sub-tabs { display: flex; gap: 15px; }
-.sub-tab { font-size: 0.75rem; color: var(--text-gray); cursor: pointer; transition: 0.2s; }
-.sub-tab:hover { color: white; }
-.sub-tab.active { color: var(--aki-teal); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
-
-/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: var(--aki-red); }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
 </style>

@@ -1,67 +1,74 @@
 <template>
-  <div class="training-container">
-    <!-- Target Selection Modal -->
-    <div class="modal-backdrop" :class="{ hidden: !showTargetModal }">
-      <div class="modal-content">
-        <div class="modal-icon">
-          <ion-icon name="locate-outline"></ion-icon>
-        </div>
-        <h2 class="modal-title">Select Target Column</h2>
-        <p class="modal-desc">Before training, select the column you want your model to predict from your dataset.</p>
-        
-        <div style="text-align: left; margin-bottom: 20px;">
-          <label style="font-size: 0.75rem; color: #888; margin-bottom: 5px; display: block;">Target Variable (Y)</label>
-          <select class="custom-select" v-model="selectedTarget">
-            <option value="" disabled>Select a column...</option>
-            <option value="price">Price (Numerical)</option>
-            <option value="category">Category (Categorical)</option>
-            <option value="churn">Churn (Binary)</option>
-          </select>
+  <div class="training-container" :class="{ collapsed: isCollapsed }">
+    
+    <nav class="sidebar" id="sidebar">
+      <div class="logo-container">
+        <ion-icon name="school-outline" style="font-size: 1.5rem; color: var(--aki-primary); vertical-align: middle;"></ion-icon>
+        <span class="logo-text hide-on-collapse" style="margin-left: 10px;">AKI MODEL TRAIN</span>
+      </div>
+
+      <div class="tools-wrapper">
+        <div class="section-title hide-on-collapse">MODEL SELECTION</div>
+
+        <div class="tool-item" :class="{ active: activeTool === 'models' }">
+          <div class="tool-header" @click="toggleTool('models')">
+            <ion-icon name="git-network-outline"></ion-icon>
+            <span class="tool-label">Algorithms</span>
+            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+          </div>
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'models' ? '600px' : '0' }">
+            <div class="form-pad hide-on-collapse">
+              <label class="sub-label">Select Algorithm</label>
+              <div class="model-list">
+                <div 
+                  v-for="model in models" 
+                  :key="model.name"
+                  class="model-option"
+                  :class="{ selected: selectedModel === model.name }"
+                  @click="selectModel(model.name)"
+                >
+                  <ion-icon :name="model.icon"></ion-icon>
+                  <span>{{ model.name }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <button class="target-btn" @click="confirmTarget">Confirm Selection</button>
-      </div>
-    </div>
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="brand-text">AKI <span style="color:var(--aki-red)">DataSuite</span></div>
-      </div>
-      
-      <div class="sidebar-content">
-        <div class="section-label">Supervised Learning</div>
-        
-        <div 
-          v-for="model in models" 
-          :key="model.name"
-          class="model-item"
-          :class="{ active: selectedModel === model.name }"
-          @click="selectModel(model.name)"
-        >
-          <span>{{ model.name }}</span>
-          <ion-icon :name="model.icon"></ion-icon>
+        <div class="tool-item" :class="{ active: activeTool === 'advanced' }">
+          <div class="tool-header" @click="toggleTool('advanced')">
+            <ion-icon name="options-outline"></ion-icon>
+            <span class="tool-label">Advanced</span>
+            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+          </div>
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'advanced' ? '500px' : '0' }">
+            <div class="form-pad hide-on-collapse">
+              <div class="placeholder-box">[Advanced Config]</div>
+            </div>
+          </div>
         </div>
+
       </div>
 
       <div class="sidebar-footer">
-        <button class="btn-prev" @click="goToProcess">
-          Back
-        </button>
-        <button class="btn-next" @click="goToPredict">
-          Predict <ion-icon name="arrow-forward-outline"></ion-icon>
+        <button class="nav-btn nav-next" @click="goToPredict">
+          <span>NEXT STEP</span>
+          <ion-icon name="arrow-forward-outline"></ion-icon>
         </button>
       </div>
-    </aside>
+    </nav>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <div class="top-bar">
-        <div style="display:flex; align-items:center; gap:20px;">
-          <div class="menu-toggle" @click="toggleSidebar">
+    <main class="main-view">
+      
+      <header class="top-header">
+        <div class="header-left">
+          <button class="menu-toggle" @click="toggleSidebar">
             <ion-icon name="menu-outline"></ion-icon>
-          </div>
-          <div class="pipeline-stepper">
+          </button>
+        </div>
+
+        <div class="header-center">
+          <div class="pipeline">
             <div class="step">CLEAN</div>
             <div class="step">FILTER</div>
             <div class="step">PROCESS</div>
@@ -69,140 +76,98 @@
             <div class="step">PREDICT</div>
           </div>
         </div>
-        
-        <div style="display:flex; gap:15px;">
-          <button class="action-btn" title="Save">
-            <ion-icon name="save-outline"></ion-icon>
-          </button>
-          <button class="action-btn" title="Home" @click="goHome">
-            <ion-icon name="home-outline"></ion-icon>
-          </button>
-        </div>
-      </div>
 
-      <div class="dashboard-grid">
-        
-        <!-- Configuration Panel -->
-        <div class="panel">
-          <div class="panel-header">
-            <span>
-              <ion-icon name="settings-outline" style="margin-right:8px; vertical-align:middle;"></ion-icon> 
-              Configuration
-            </span>
+        <div class="header-right">
+          <button class="top-nav-btn" @click="goHome">
+            <ion-icon name="home-outline"></ion-icon>
+            <span>Home</span>
+          </button>
+          
+          <button class="top-nav-btn logout">
+            <ion-icon name="log-out-outline"></ion-icon>
+            <span>Logout</span>
+          </button>
+          
+          <div class="user-avatar">
+            <ion-icon name="person-circle-outline"></ion-icon>
           </div>
-          <div class="config-scroll">
-            <div class="form-group">
-              <label>Target Column</label>
-              <input 
-                type="text" 
-                class="custom-input" 
-                :value="targetDisplay" 
-                disabled 
-                style="opacity: 0.6; cursor: not-allowed;"
-              >
-            </div>
+        </div>
+      </header>
+
+      <div class="content-grid">
+        
+        <div class="glass-panel">
+          <div class="panel-head">
+            <span class="panel-label" style="color: #ffcc00;">● CONFIGURATION</span>
+            <ion-icon name="settings-outline" style="color:#666;"></ion-icon>
+          </div>
+          <div class="panel-content-pad">
             
-            <div class="form-group">
-              <label>Test Split Ratio</label>
-              <select class="custom-select" v-model="testSplitRatio">
+            <div class="input-group">
+              <label class="sub-label">Target Column (Y)</label>
+              <select class="f-input" v-model="selectedTarget">
+                <option value="" disabled>Select Target...</option>
+                <option value="price">Price (Numerical)</option>
+                <option value="category">Category (Categorical)</option>
+                <option value="churn">Churn (Binary)</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label class="sub-label">Test Split Ratio</label>
+              <select class="f-input" v-model="testSplitRatio">
                 <option value="80-20">80% Train / 20% Test</option>
                 <option value="70-30">70% Train / 30% Test</option>
                 <option value="cv-5">Fold Cross Validation (5)</option>
               </select>
             </div>
 
-            <div style="border-top: 1px solid var(--border-color); margin: 15px 0; padding-top: 15px;">
-              <label style="color:var(--aki-teal); font-size:0.75rem; font-weight:600; margin-bottom:10px; display:block;">
-                HYPERPARAMETERS
-              </label>
-              
-              <div class="form-group">
-                <label>n_estimators (Trees)</label>
-                <input 
-                  type="number" 
-                  class="custom-input" 
-                  v-model.number="hyperparameters.n_estimators"
-                >
-              </div>
-              <div class="form-group">
-                <label>max_depth</label>
-                <input 
-                  type="number" 
-                  class="custom-input" 
-                  v-model.number="hyperparameters.max_depth"
-                >
-              </div>
-              <div class="form-group">
-                <label>Criterion</label>
-                <select class="custom-select" v-model="hyperparameters.criterion">
-                  <option value="gini">Gini Impurity</option>
-                  <option value="entropy">Entropy</option>
-                </select>
-              </div>
-            </div>
+            <div class="divider">HYPERPARAMETERS</div>
+             
+             <div class="input-row">
+                <div class="input-group">
+                  <label class="sub-label">n_estimators</label>
+                  <input type="number" class="f-input" v-model.number="hyperparameters.n_estimators">
+                </div>
+                <div class="input-group">
+                   <label class="sub-label">max_depth</label>
+                  <input type="number" class="f-input" v-model.number="hyperparameters.max_depth">
+                </div>
+             </div>
 
-            <button 
-              class="train-btn-large" 
-              :disabled="!selectedTarget || isTraining"
-              @click="startTraining"
-            >
-              <ion-icon name="play-circle-outline" style="font-size:1.2rem;"></ion-icon>
-              {{ isTraining ? 'Training...' : 'Start Training' }}
-            </button>
+             <button class="train-btn" :disabled="!selectedTarget || isTraining" @click="startTraining">
+                <ion-icon name="play-circle-outline"></ion-icon>
+                {{ isTraining ? 'Training...' : 'Start Training' }}
+             </button>
+
           </div>
         </div>
 
-        <!-- Model Performance Panel -->
-        <div class="panel">
-          <div class="panel-header">
-            <span>
-              <ion-icon name="stats-chart-outline" style="margin-right:8px; vertical-align:middle;"></ion-icon> 
-              Model Performance
-            </span>
-            <span style="font-size:0.75rem; color:var(--aki-teal);">
-              Status: {{ trainingStatus }}
-            </span>
+        <div class="glass-panel">
+          <div class="panel-head">
+            <span class="panel-label" style="color: var(--aki-primary);">● PERFORMANCE</span>
+            <span class="status-badge">{{ trainingStatus }}</span>
           </div>
-          <div class="viz-scroll">
+          <div class="panel-content-pad">
             
-            <div class="stats-row">
-              <div class="stat-card">
-                <div class="stat-val" style="color:var(--aki-teal);">
-                  {{ modelPerformance.accuracy }}%
-                </div>
-                <div class="stat-label">Accuracy</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-val">{{ modelPerformance.f1Score }}</div>
-                <div class="stat-label">F1 Score</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-val">{{ modelPerformance.precision }}</div>
-                <div class="stat-label">Precision</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-val">{{ modelPerformance.recall }}</div>
-                <div class="stat-label">Recall</div>
-              </div>
+            <div class="metrics-row">
+               <div class="metric-card">
+                 <div class="m-val" style="color:var(--aki-primary)">{{ modelPerformance.accuracy }}%</div>
+                 <div class="m-lbl">Accuracy</div>
+               </div>
+               <div class="metric-card">
+                 <div class="m-val">{{ modelPerformance.f1Score }}</div>
+                 <div class="m-lbl">F1 Score</div>
+               </div>
+               <div class="metric-card">
+                 <div class="m-val">{{ modelPerformance.precision }}</div>
+                 <div class="m-lbl">Precision</div>
+               </div>
             </div>
 
-            <div class="chart-placeholder">
-              <div class="chart-overlay"></div>
-              <div style="text-align: center;">
-                <ion-icon name="bar-chart-outline"></ion-icon>
-                <p style="font-size:0.8rem; color:#666; margin-top:10px;">
-                  {{ chartPlaceholderText }}
-                </p>
-              </div>
-            </div>
-            
-            <div style="display:flex; gap:15px; height: 200px;">
-              <div class="chart-placeholder" style="min-height:auto;">
-                <p style="position:absolute; top:10px; left:15px; font-size:0.7rem; color:#888;">Confusion Matrix</p>
-              </div>
-              <div class="chart-placeholder" style="min-height:auto;">
-                <p style="position:absolute; top:10px; left:15px; font-size:0.7rem; color:#888;">ROC Curve</p>
-              </div>
+            <div class="chart-area">
+               <ion-icon name="bar-chart-outline"></ion-icon>
+               <span>{{ chartPlaceholderText }}</span>
             </div>
 
           </div>
@@ -218,10 +183,13 @@ export default {
   name: 'TrainingView',
   data() {
     return {
-      isSidebarClosed: false,
+      // Structural State
+      isCollapsed: false,
+      activeTool: 'models',
+
+      // Logic State
       selectedModel: 'Random Forest',
-      showTargetModal: false,
-      selectedTarget: '',
+      selectedTarget: 'price',
       isTraining: false,
       testSplitRatio: '80-20',
       trainingStatus: 'Ready',
@@ -230,12 +198,8 @@ export default {
         { name: 'Random Forest', icon: 'git-network-outline' },
         { name: 'Linear Regression', icon: 'trending-up-outline' },
         { name: 'Logistic Regression', icon: 'analytics-outline' },
-        { name: 'K-Nearest Neighbors (KNN)', icon: 'apps-outline' },
-        { name: 'Support Vector Machine', icon: 'contract-outline' },
         { name: 'Decision Tree', icon: 'git-merge-outline' },
-        { name: 'Naïve Bayes', icon: 'filter-circle-outline' },
         { name: 'XGBoost', icon: 'rocket-outline' },
-        { name: 'Gradient Boosting', icon: 'layers-outline' }
       ],
 
       hyperparameters: {
@@ -245,133 +209,100 @@ export default {
       },
 
       modelPerformance: {
-        accuracy: '94.2',
-        f1Score: '0.89',
-        precision: '0.91',
-        recall: '0.87'
+        accuracy: '0.0',
+        f1Score: '0.00',
+        precision: '0.00'
       }
     }
   },
-
   computed: {
-    targetDisplay() {
-      const targetMap = {
-        'price': 'Price (Numerical)',
-        'category': 'Category (Categorical)',
-        'churn': 'Churn (Binary)'
-      }
-      return this.selectedTarget ? targetMap[this.selectedTarget] : 'Not Selected'
-    },
-
     chartPlaceholderText() {
-      if (!this.selectedTarget) {
-        return 'Select target column to view feature importance'
-      }
-      if (this.isTraining) {
-        return 'Training in progress...'
-      }
-      if (this.trainingStatus === 'Completed') {
-        return 'Feature importance chart will be displayed here'
-      }
-      return 'Train the model to view feature importance'
+      if (this.isTraining) return 'Training in progress...'
+      if (this.trainingStatus === 'Completed') return 'Feature Importance Visualization'
+      return 'Train model to view stats'
     }
   },
-
   methods: {
+    // UI Structure Methods
     toggleSidebar() {
-      this.isSidebarClosed = !this.isSidebarClosed
-    },
-
-    selectModel(modelName) {
-      this.selectedModel = modelName
-    },
-
-    openTargetModal() {
-      this.showTargetModal = true
-    },
-
-    confirmTarget() {
-      if (this.selectedTarget) {
-        this.showTargetModal = false
-        // Update training status
-        this.trainingStatus = 'Ready'
+      this.isCollapsed = !this.isCollapsed
+      if(this.isCollapsed) {
+        this.activeTool = null
       } else {
-        alert("Please select a target column to proceed.")
+        this.activeTool = 'models'
       }
+    },
+    toggleTool(toolName) {
+      if(this.isCollapsed) {
+        this.isCollapsed = false
+        setTimeout(() => { this.activeTool = toolName }, 200)
+        return
+      }
+      this.activeTool = this.activeTool === toolName ? null : toolName
+    },
+
+    // Logic Methods
+    selectModel(name) {
+      this.selectedModel = name
     },
 
     startTraining() {
-      if (!this.selectedTarget) {
-        this.openTargetModal()
-        return
-      }
-
       this.isTraining = true
       this.trainingStatus = 'Training...'
-
-      // Simulate training process
+      
       setTimeout(() => {
         this.isTraining = false
         this.trainingStatus = 'Completed'
-        
-        // Update performance metrics with some variation
         this.modelPerformance = {
-          accuracy: (90 + Math.random() * 8).toFixed(1),
-          f1Score: (0.85 + Math.random() * 0.1).toFixed(2),
-          precision: (0.88 + Math.random() * 0.08).toFixed(2),
-          recall: (0.82 + Math.random() * 0.12).toFixed(2)
+          accuracy: '94.2',
+          f1Score: '0.89',
+          precision: '0.91'
         }
-      }, 3000)
+      }, 2000)
     },
 
-    goToProcess() {
-      this.$router.push('/process')
-    },
-
-    goToPredict() {
-      this.$router.push('/predict')
-    },
-
+    // Navigation
     goHome() {
       this.$router.push('/')
+    },
+    goToPredict() {
+      this.$router.push('/predict')
     }
-  },
-
-  mounted() {
-    // Auto-open target modal on component mount
-    this.openTargetModal()
   }
 }
 </script>
 
 <style scoped>
-/* --- THEME VARIABLES (MATCHING FILTERING & PREPROCESSING) --- */
+/* --- DESIGN TOKENS (Exact copy from CleaningView) --- */
 :host {
-  --bg-color: #050505;
-  --sidebar-bg: rgba(18, 18, 18, 0.85);
-  --card-bg: rgba(24, 24, 27, 0.6);
-  --input-bg: #27272a;
-  --aki-teal: #26a69a;
-  --aki-red: #e53935;
-  --aki-red-glow: rgba(229, 57, 53, 0.5);
-  --text-white: #ffffff;
-  --text-gray: #a1a1aa;
-  --border-color: rgba(255, 255, 255, 0.1);
-  --sidebar-width: 340px;
-  --transition-speed: 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  --bg-deep: #050505;
+  --bg-glass: rgba(20, 20, 20, 0.75);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  
+  --aki-primary: #00F0FF; 
+  --aki-primary-dim: rgba(0, 240, 255, 0.08);
+  --aki-danger: #FF2A6D;  
+  
+  --text-main: #ffffff;
+  --text-muted: #888899;
+  
+  --sidebar-width: 280px;
+  --sidebar-collapsed: 70px;
+  --trans-speed: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
 .training-container {
-  background-color: var(--bg-color);
+  background-color: var(--bg-deep);
   background-image: 
-    radial-gradient(circle at 0% 0%, rgba(38, 166, 154, 0.08), transparent 40%),
-    radial-gradient(circle at 100% 100%, rgba(229, 57, 53, 0.08), transparent 40%);
-  color: var(--text-white);
+    radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(255, 42, 109, 0.05) 0px, transparent 50%);
+  color: var(--text-main);
   height: 100vh;
   display: flex;
   overflow: hidden;
+  transition: all var(--trans-speed);
 }
 
 /* ===========================
@@ -379,412 +310,271 @@ export default {
 =========================== */
 .sidebar {
   width: var(--sidebar-width);
-  background-color: var(--sidebar-bg);
-  border-right: 1px solid var(--border-color);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border-glass);
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  backdrop-filter: blur(15px);
-  z-index: 50;
-  flex-shrink: 0;
+  transition: width var(--trans-speed);
+  position: relative;
+  z-index: 100;
+  padding: 15px 0;
+  overflow: hidden;
 }
 
-/* Collapsed State */
-.training-container.sidebar-closed .sidebar {
-  margin-left: calc(var(--sidebar-width) * -1);
+.training-container.collapsed .sidebar { width: var(--sidebar-collapsed); }
+.training-container.collapsed .hide-on-collapse { opacity: 0; pointer-events: none; display: none; }
+
+/* Logo */
+.logo-container {
+  padding: 0 20px 20px 20px;
+  white-space: nowrap;
+}
+.logo-text {
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #fff, #bbb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.training-container.collapsed .logo-container { padding: 0 0 20px 0; text-align: center; }
+
+/* Tools Wrapper */
+.tools-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.sidebar-header { padding: 25px; border-bottom: 1px solid var(--border-color); }
-.brand-text { font-weight: 800; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
-
-.sidebar-content { 
-  flex: 1; 
-  overflow-y: auto; 
-  padding: 20px; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 8px; 
-}
-.section-label { 
-  font-size: 0.7rem; 
-  color: #666; 
-  text-transform: uppercase; 
-  margin-top: 10px; 
-  margin-bottom: 5px; 
-  font-weight: 700; 
+.section-title {
+  font-size: 0.65rem;
+  color: #555;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+  padding-left: 4px;
 }
 
-/* Model Items */
-.model-item {
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.03); 
-  border: 1px solid var(--border-color);
-  padding: 12px 14px; 
-  border-radius: 8px; 
-  cursor: pointer; 
+/* Accordion Item */
+.tool-item {
+  border: 1px solid var(--border-glass);
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  overflow: hidden;
   transition: 0.2s;
-  color: var(--text-gray); 
-  font-size: 0.8rem; 
+}
+
+.tool-header {
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #aaa;
+  font-size: 0.8rem;
   font-weight: 500;
+  transition: 0.2s;
+  min-height: 45px;
 }
-.model-item:hover, .model-item.active {
-  background: rgba(255, 255, 255, 0.08); 
-  border-color: var(--aki-red);
-  color: white; 
-  transform: translateX(5px);
+
+.tool-header ion-icon { font-size: 1rem; color: var(--aki-primary); flex-shrink: 0; }
+.tool-item:hover { background: rgba(255,255,255,0.05); }
+.tool-item.active { border-color: rgba(0, 240, 255, 0.4); background: var(--aki-primary-dim); }
+.tool-item.active .tool-header { color: white; }
+
+.training-container.collapsed .tool-header { justify-content: center; padding: 12px 0; }
+.training-container.collapsed .tool-label, .training-container.collapsed .chevron { display: none; }
+
+/* Tool Content Form */
+.tool-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: rgba(0,0,0,0.3);
 }
-.model-item ion-icon { font-size: 1.1rem; }
+.tool-item.active .tool-content { border-top: 1px solid rgba(255,255,255,0.05); }
+
+.form-pad { padding: 15px 12px; }
+
+/* --- CUSTOM TRAINING SIDEBAR LIST --- */
+.model-list { display: flex; flex-direction: column; gap: 4px; }
+.model-option {
+  padding: 8px; border-radius: 4px; cursor: pointer; color: #888;
+  display: flex; align-items: center; gap: 10px; font-size: 0.75rem;
+  transition: 0.2s;
+}
+.model-option:hover { background: rgba(255,255,255,0.05); color: white; }
+.model-option.selected { background: var(--aki-primary-dim); color: var(--aki-primary); border: 1px solid rgba(0,240,255,0.2); }
+
 
 /* Sidebar Footer */
-.sidebar-footer { 
-  padding: 20px; 
-  border-top: 1px solid var(--border-color); 
-  display: grid; 
-  grid-template-columns: 1fr 1.5fr; 
-  gap: 10px; 
+.sidebar-footer {
+  margin-top: auto;
+  padding: 15px 12px;
+  border-top: 1px solid var(--border-glass);
 }
-.btn-prev, .btn-next {
-  padding: 12px; border-radius: 6px; cursor: pointer; transition: 0.2s;
-  font-weight: 600; font-size: 0.85rem; border: 1px solid transparent;
+.nav-next {
+  width: 100%;
+  background: var(--aki-danger);
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(255, 42, 109, 0.2);
+  transition: 0.2s;
 }
-.btn-prev { 
-  background: transparent; 
-  border-color: var(--border-color); 
-  color: var(--text-gray); 
-}
-.btn-prev:hover { border-color: white; color: white; }
-.btn-next { 
-  background: var(--aki-red); 
-  color: white; 
-  border: none; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  gap: 8px; 
-  box-shadow: 0 0 15px var(--aki-red-glow); 
-}
-.btn-next:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--aki-red-glow); }
+.nav-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 42, 109, 0.4); }
+.training-container.collapsed .nav-next span { display: none; }
 
 /* ===========================
-   2. MAIN CONTENT
+   2. MAIN VIEW
 =========================== */
-.main-content { 
-  flex: 1; 
-  display: flex; 
-  flex-direction: column; 
-  overflow: hidden; 
+.main-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 30px;
+  border-bottom: 1px solid var(--border-glass);
   position: relative; 
 }
 
-/* Top Bar */
-.top-bar {
-  padding: 20px 30px; 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center;
-  border-bottom: 1px solid var(--border-color); 
-  background: rgba(5, 5, 5, 0.6); 
-  backdrop-filter: blur(10px);
+.header-left { display: flex; align-items: center; gap: 20px; z-index: 2; }
+.header-right { display: flex; align-items: center; gap: 15px; z-index: 2; }
+
+/* === HEADER CENTER (PIPELINE) === */
+.header-center {
+  position: absolute;
+  left: 42%;
+  transform: translateX(-50%);
+  z-index: 1;
 }
 
 .menu-toggle {
-  font-size: 1.8rem; 
-  cursor: pointer; 
-  color: white;
-  transition: 0.2s;
+  background: transparent; border: none; color: white;
+  font-size: 1.6rem; cursor: pointer; display: flex;
+}
+.menu-toggle:hover { color: var(--aki-primary); }
+
+.pipeline {
+  display: flex; gap: 4px; background: #0a0a0a;
+  padding: 4px; border-radius: 50px; border: 1px solid #222;
+}
+.step {
+  padding: 5px 14px; border-radius: 40px; font-size: 0.7rem;
+  font-weight: 600; color: #555; cursor: default;
+}
+.step.active {
+  background: #1f1f1f; color: var(--aki-primary); border: 1px solid #333;
+}
+
+.top-nav-btn {
   background: transparent;
-  border: none;
-}
-.menu-toggle:hover { color: var(--aki-teal); }
-
-.pipeline-stepper { 
-  display: flex; 
-  gap: 2px; 
-  background: #111; 
-  padding: 4px; 
-  border-radius: 8px; 
-  border: 1px solid #333; 
-}
-.step { 
-  padding: 6px 12px; 
-  border-radius: 6px; 
-  font-size: 0.75rem; 
-  font-weight: 700; 
-  color: #555; 
-  cursor: pointer; 
-}
-.step.active { 
-  background: #222; 
-  color: var(--aki-red); 
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
-}
-
-.action-btn { 
-  background: transparent; 
-  border: 1px solid var(--border-color); 
-  padding: 8px; 
-  border-radius: 8px; 
-  color: var(--text-gray); 
-  font-size: 1.2rem; 
-  cursor: pointer; 
-  transition: 0.2s; 
-}
-.action-btn:hover { border-color: var(--aki-teal); color: var(--aki-teal); }
-
-/* Dashboard Grid */
-.dashboard-grid {
-  display: grid; 
-  grid-template-columns: 320px 1fr; 
-  gap: 25px; 
-  padding: 25px;
-  flex: 1; 
-  overflow: hidden;
-}
-
-/* Panels */
-.panel {
-  background: var(--card-bg); 
-  border: 1px solid var(--border-color); 
-  border-radius: 16px;
-  overflow: hidden; 
-  backdrop-filter: blur(12px); 
-  display: flex; 
-  flex-direction: column;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-.panel-header { 
-  padding: 15px; 
-  border-bottom: 1px solid var(--border-color); 
-  font-weight: 600; 
-  font-size: 0.9rem; 
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between; 
-  color: white; 
-}
-
-/* Configuration Form */
-.config-scroll { padding: 20px; overflow-y: auto; flex: 1; }
-.form-group { margin-bottom: 18px; }
-.form-group label { 
-  display: block; 
-  font-size: 0.75rem; 
-  color: var(--text-gray); 
-  margin-bottom: 8px; 
-}
-.custom-input, .custom-select { 
-  width: 100%; 
-  background: var(--input-bg); 
-  border: 1px solid var(--border-color); 
-  color: white; 
-  padding: 10px; 
-  border-radius: 6px; 
-  outline: none; 
-  font-size: 0.85rem; 
-}
-.custom-input:focus, .custom-select:focus { border-color: var(--aki-red); }
-
-.train-btn-large {
-  width: 100%; 
-  padding: 14px; 
-  background: var(--aki-red); 
-  color: white; 
-  border: none; 
-  border-radius: 8px; 
-  font-weight: 600; 
+  border: 1px solid var(--border-glass);
+  color: #aaa;
+  padding: 6px 14px;
+  border-radius: 20px;
   cursor: pointer;
-  box-shadow: 0 0 20px var(--aki-red-glow); 
-  transition: 0.3s; 
-  margin-top: 10px; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  gap: 10px;
-}
-.train-btn-large:hover:not(:disabled) { transform: scale(1.02); }
-.train-btn-large:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Visualization Area */
-.viz-scroll { 
-  padding: 20px; 
-  overflow-y: auto; 
-  flex: 1; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 20px; 
-}
-.stats-row { 
-  display: grid; 
-  grid-template-columns: repeat(4, 1fr); 
-  gap: 15px; 
-}
-.stat-card { 
-  background: rgba(0,0,0,0.3); 
-  border: 1px solid var(--border-color); 
-  padding: 15px; 
-  border-radius: 10px; 
-  text-align: center; 
-}
-.stat-val { 
-  font-size: 1.4rem; 
-  font-weight: 700; 
-  color: white; 
-  margin-bottom: 4px; 
-}
-.stat-label { 
-  font-size: 0.7rem; 
-  color: var(--text-gray); 
-  text-transform: uppercase; 
-  letter-spacing: 0.5px; 
-}
-
-.chart-placeholder {
-  flex: 1; 
-  min-height: 300px; 
-  background: rgba(0,0,0,0.2); 
-  border: 1px dashed var(--border-color); 
-  border-radius: 12px;
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  position: relative; 
-  overflow: hidden;
-}
-.chart-placeholder ion-icon { 
-  font-size: 4rem; 
-  opacity: 0.2; 
-  color: white; 
-}
-.chart-overlay { 
-  position: absolute; 
-  bottom: 0; 
-  left: 0; 
-  width: 100%; 
-  height: 50%; 
-  background: linear-gradient(0deg, rgba(38, 166, 154, 0.1), transparent); 
-}
-
-/* ===========================
-   3. POPUP MODAL
-=========================== */
-.modal-backdrop {
-  position: fixed; 
-  top: 0; 
-  left: 0; 
-  width: 100%; 
-  height: 100%;
-  background: rgba(0,0,0,0.85); 
-  backdrop-filter: blur(8px);
-  z-index: 999; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
-  opacity: 1; 
-  transition: opacity 0.3s ease;
-}
-.modal-backdrop.hidden { 
-  opacity: 0; 
-  pointer-events: none; 
-}
-
-.modal-content {
-  background: #18181b; 
-  border: 1px solid var(--border-color);
-  width: 450px; 
-  border-radius: 16px; 
-  padding: 30px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  text-align: center; 
-  transform: scale(1); 
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.modal-backdrop.hidden .modal-content { transform: scale(0.9); }
-
-.modal-icon {
-  width: 60px; 
-  height: 60px; 
-  background: rgba(229, 57, 53, 0.1); 
-  color: var(--aki-red);
-  border-radius: 50%; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
-  font-size: 1.8rem; 
-  margin: 0 auto 20px auto; 
-  border: 1px solid rgba(229, 57, 53, 0.3);
-}
-.modal-title { 
-  font-size: 1.2rem; 
-  font-weight: 700; 
-  color: white; 
-  margin-bottom: 10px; 
-}
-.modal-desc { 
-  font-size: 0.85rem; 
-  color: var(--text-gray); 
-  margin-bottom: 25px; 
-  line-height: 1.5; 
-}
-
-.target-btn {
-  width: 100%; 
-  padding: 12px; 
-  background: white; 
-  color: black; 
-  border: none; 
-  font-weight: 600; 
-  border-radius: 8px; 
-  cursor: pointer; 
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
   transition: 0.2s;
 }
-.target-btn:hover { background: #e0e0e0; }
+.top-nav-btn:hover { border-color: #666; color: white; background: rgba(255,255,255,0.05); }
+.top-nav-btn.logout:hover { border-color: var(--aki-danger); color: var(--aki-danger); }
 
-/* ===========================
-   4. RESPONSIVE DESIGN
-=========================== */
-@media (max-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .stats-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.user-avatar { font-size: 1.8rem; color: #444; display: flex; align-items: center; }
+
+/* === CONTENT GRID === */
+.content-grid {
+  flex: 1;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  overflow: hidden;
 }
 
-@media (max-width: 768px) {
-  .training-container.sidebar-closed .sidebar {
-    margin-left: 0;
-  }
-  
-  .sidebar {
-    position: absolute;
-    z-index: 100;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-  
-  .training-container.sidebar-open .sidebar {
-    transform: translateX(0);
-  }
-  
-  .stats-row {
-    grid-template-columns: 1fr;
-  }
-  
-  .top-bar {
-    padding: 15px 20px;
-  }
-  
-  .dashboard-grid {
-    padding: 15px;
-  }
+.glass-panel {
+  background: rgba(15, 15, 17, 0.6);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
+.panel-head {
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border-glass);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.panel-label { font-size: 0.8rem; font-weight: 700; color: #ddd; letter-spacing: 0.5px; }
+.panel-content-pad { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+
+/* Form Elements */
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+.sub-label { font-size: 0.75rem; color: #999; font-weight: 500; }
+.f-input {
+  background: rgba(0,0,0,0.3); border: 1px solid #333; color: white;
+  padding: 10px; border-radius: 6px; outline: none; font-size: 0.8rem;
+}
+.f-input:focus { border-color: var(--aki-primary); }
+
+.divider {
+  border-top: 1px solid var(--border-glass); margin-top: 10px; padding-top: 15px;
+  font-size: 0.7rem; color: var(--aki-primary); font-weight: 700; letter-spacing: 1px;
+}
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+.train-btn {
+  margin-top: auto; background: var(--aki-primary); color: #000; border: none;
+  padding: 12px; border-radius: 6px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: 0.2s;
+}
+.train-btn:hover:not(:disabled) { box-shadow: 0 0 15px var(--aki-primary-dim); transform: translateY(-1px); }
+.train-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Performance Elements */
+.status-badge { font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; color: #aaa; }
+.metrics-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.metric-card { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px; border-radius: 8px; text-align: center; }
+.m-val { font-size: 1.2rem; font-weight: 700; color: white; }
+.m-lbl { font-size: 0.65rem; color: #777; margin-top: 2px; text-transform: uppercase; }
+
+.chart-area {
+  flex: 1; background: rgba(0,0,0,0.2); border: 1px dashed #333; border-radius: 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; gap: 10px;
+  min-height: 200px;
+}
+.chart-area ion-icon { font-size: 3rem; opacity: 0.3; }
+
+.placeholder-box { padding: 10px; border: 1px dashed #444; text-align: center; color: #666; font-size: 0.7rem; border-radius: 6px; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
 </style>
