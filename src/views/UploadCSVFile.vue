@@ -198,7 +198,22 @@ export default {
 </script>
 
 <style scoped>
+/* =========================================
+   Global/Container Styles
+   ========================================= */
 .upload-csv-container {
+  /* Define Variables locally for this scope */
+  --bg-color: #0d0d0d;
+  --card-bg: #141414;
+  --input-bg: #1f1f1f;
+  --primary-gradient: linear-gradient(135deg, #d32f2f 0%, #ff5252 100%);
+  --primary-glow: 0 4px 20px rgba(229, 57, 53, 0.5);
+  --primary-red: #e53935;
+  --text-white: #ffffff;
+  --text-gray: #a1a1aa;
+  --border-color: #333333;
+  --success-color: #10b981;
+
   background-color: var(--bg-color);
   color: var(--text-white);
   min-height: 100vh;
@@ -220,21 +235,9 @@ export default {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* CSS Variables */
-:host {
-  --bg-color: #0d0d0d;
-  --card-bg: #141414;
-  --input-bg: #1f1f1f;
-  --primary-gradient: linear-gradient(135deg, #d32f2f 0%, #ff5252 100%);
-  --primary-glow: 0 4px 20px rgba(229, 57, 53, 0.5);
-  --primary-red: #e53935;
-  --text-white: #ffffff;
-  --text-gray: #a1a1aa;
-  --border-color: #333333;
-  --success-color: #10b981;
-}
-
-/* Header Actions */
+/* =========================================
+   Header & Actions
+   ========================================= */
 .header-actions {
   display: flex;
   justify-content: flex-end;
@@ -265,7 +268,9 @@ export default {
   transform: translateY(-2px);
 }
 
-/* Main Card */
+/* =========================================
+   Main Card Styling
+   ========================================= */
 .main-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -277,7 +282,7 @@ export default {
   flex-direction: column;
 }
 
-/* Top Red Line */
+/* Top Red Line Decoration */
 .main-card::before {
   content: '';
   position: absolute;
@@ -306,7 +311,9 @@ export default {
   color: var(--text-gray); 
 }
 
-/* Selection Grid */
+/* =========================================
+   Selection Grid Layout
+   ========================================= */
 .selection-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -339,7 +346,9 @@ export default {
   color: var(--primary-red); 
 }
 
-/* Dropdown */
+/* =========================================
+   Dropdown / Select Styles (UPDATED)
+   ========================================= */
 .custom-select-wrapper { 
   position: relative; 
 }
@@ -362,6 +371,13 @@ select:focus {
   box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.1);
 }
 
+/* --- FIX FOR DARK OPTIONS --- */
+select option {
+  background-color: var(--card-bg); /* Sets dropdown background to dark gray */
+  color: var(--text-white);         /* Sets text to white */
+  padding: 12px;
+}
+
 .select-arrow {
   position: absolute;
   right: 15px;
@@ -371,7 +387,9 @@ select:focus {
   color: var(--text-gray);
 }
 
-/* Upload Area */
+/* =========================================
+   Upload Area
+   ========================================= */
 .upload-area {
   border: 2px dashed var(--border-color);
   background: linear-gradient(180deg, rgba(255,255,255,0.01) 0%, rgba(255,255,255,0.03) 100%);
@@ -430,7 +448,9 @@ select:focus {
   display: block;
 }
 
-/* Description */
+/* =========================================
+   Description & Inputs
+   ========================================= */
 .desc-section { 
   margin-top: 20px; 
 }
@@ -460,7 +480,9 @@ textarea:focus {
   box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.1);
 }
 
-/* Footer Section */
+/* =========================================
+   Footer & Buttons
+   ========================================= */
 .footer-section {
   display: flex;
   flex-direction: column;
@@ -477,7 +499,6 @@ textarea:focus {
   font-weight: 600;
 }
 
-/* CTA Button */
 .btn-cta {
   width: 100%;
   padding: 18px;
@@ -513,7 +534,9 @@ textarea:focus {
   font-size: 1.4rem;
 }
 
-/* Responsive */
+/* =========================================
+   Responsive Design
+   ========================================= */
 @media (max-width: 768px) {
   .selection-grid { 
     grid-template-columns: 1fr; 

@@ -1,26 +1,25 @@
 <template>
   <div class="data-processing-container">
     <div class="container">
+      
       <div class="nav-bar">
-        <div class="nav-group">
-          <button class="btn-secondary" @click="goBack">
+        <div class="nav-group left-group">
+          <button class="btn-primary" @click="goBack">
             <ion-icon name="arrow-back-outline"></ion-icon>
-            Back to Project Manager
+            Go Back
           </button>
         </div>
 
-        <div class="nav-group" style="flex-grow: 1; max-width: 400px; margin: 0 auto;">
-          <label class="nav-label">Active Dataset Source</label>
+        <div class="nav-group center-group">
           <div class="custom-select">
-            <select id="datasetSelect" v-model="selectedDataset" @change="handleDatasetChange">
-              <option value="modified">Modified Dataset (Current)</option>
-              <option value="original">Original Uploaded Data</option>
-            </select>
+            <!-- <select id="datasetSelect" v-model="selectedDataset" @change="handleDatasetChange">
+               <option value="modified">Modified Dataset (Current)</option>
+            </select> -->
             <ion-icon name="chevron-down-outline" class="select-arrow"></ion-icon>
           </div>
         </div>
 
-        <div class="nav-group">
+        <div class="nav-group right-group">
           <button class="btn-primary" @click="goToCleaning">
             Next: Processing
             <ion-icon name="arrow-forward-circle-outline" style="font-size: 1.3rem;"></ion-icon>
@@ -40,21 +39,33 @@
           <h2>Data Preview</h2>
         </div>
 
-        <div class="table-responsive">
-          <table id="previewTable">
-            <thead>
-              <tr>
-                <th v-for="header in dataHeaders" :key="header">{{ header }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, rowIndex) in dataRows" :key="rowIndex">
-                <td v-for="(cell, cellIndex) in row" :key="cellIndex">
-                  {{ formatCellValue(cell) }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table id="previewTable">
+              <thead>
+                <tr>
+                  <th v-for="header in dataHeaders" :key="header">{{ header }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, rowIndex) in dataRows" :key="rowIndex">
+                  <td v-for="(cell, cellIndex) in row" :key="cellIndex">
+                    {{ formatCellValue(cell) }}
+                  </td>
+                </tr>
+                <tr v-for="(row, rowIndex) in dataRows" :key="'dup'+rowIndex">
+                  <td v-for="(cell, cellIndex) in row" :key="cellIndex">
+                    {{ formatCellValue(cell) }}
+                  </td>
+                </tr>
+                 <tr v-for="(row, rowIndex) in dataRows" :key="'dup2'+rowIndex">
+                  <td v-for="(cell, cellIndex) in row" :key="cellIndex">
+                    {{ formatCellValue(cell) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
     </div>
@@ -107,7 +118,7 @@ export default {
     },
 
     goBack() {
-      this.$router.push('/')
+      this.$router.push('/upload-csv')
     },
 
     goToCleaning() {
@@ -117,20 +128,20 @@ export default {
     handleDatasetChange(event) {
       const selectedOption = event.target.options[event.target.selectedIndex].text
       this.showNotification(`Switched context to: ${selectedOption}`)
-      // In a real app, you would fetch new data and update dataRows here.
     }
   },
   mounted() {
-    // Show initial success message with delay for animation
     setTimeout(() => {
-      this.showNotification('Successfully loaded existing "Modified Dataset" from server.')
+      this.showNotification('Successfully loaded Dataset from server.')
     }, 500)
   }
 }
 </script>
 
 <style scoped>
-/* --- CSS VARIABLES (Your Theme) --- */
+/* =========================================
+   Global Variables & Root Setup
+   ========================================= */
 :host {
   --bg-color: #0d0d0d;
   --card-bg: #141414;
@@ -142,13 +153,15 @@ export default {
   --text-gray: #a1a1aa;
   --border-color: #333333;
   --success-color: #10b981;
-  --success-glow: 0 4px 20px rgba(16, 185, 129, 0.4);
 }
 
 .data-processing-container {
   background-color: var(--bg-color);
   color: var(--text-white);
-  min-height: 100vh;
+  /* Use fixed viewport height and hide body scroll */
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; 
   padding: 20px;
   background-image: radial-gradient(circle at 50% 0%, rgba(229, 57, 53, 0.1), transparent 50%);
   display: flex;
@@ -159,7 +172,11 @@ export default {
 .container {
   width: 100%;
   max-width: 1200px;
+  height: 100%; /* Fill the viewport */
+  display: flex;
+  flex-direction: column;
   animation: fadeIn 0.8s ease-out;
+  position: relative; /* For absolute positioning of notification */
 }
 
 @keyframes fadeIn {
@@ -167,101 +184,62 @@ export default {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- TOP NAVIGATION BAR --- */
+/* =========================================
+   Navigation Bar (Updated for Split View)
+   ========================================= */
 .nav-bar {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 20px;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
+  justify-content: space-between; /* Pushes left/right groups to edges */
+  align-items: center;
+  margin-bottom: 20px;
+  flex-shrink: 0; /* Prevents navbar from shrinking */
 }
 
 .nav-group {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.nav-label {
-  font-size: 0.85rem;
-  color: var(--text-gray);
-  margin-left: 4px;
-}
-
-/* Secondary Button Style (Home) */
-.btn-secondary {
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
-  background-color: rgba(255, 255, 255, 0.03);
-  color: var(--text-gray);
-  border: 1px solid var(--border-color);
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-  height: 48px;
-  text-decoration: none;
 }
 
-.btn-secondary:hover {
-  border-color: var(--primary-red);
-  color: var(--text-white);
-  background-color: rgba(229, 57, 53, 0.1);
-  transform: translateY(-2px);
+.center-group {
+  flex-grow: 1;
+  justify-content: center;
+  max-width: 400px;
+  margin: 0 20px;
 }
 
-/* Primary Gradient Button Style (Next) */
-.btn-primary {
-  padding: 12px 30px;
-  border-radius: 8px;
-  border: none;
-  background: var(--primary-gradient);
-  color: white;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--primary-glow);
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 48px;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 25px rgba(229, 57, 53, 0.7);
-}
-
-/* Styled Dropdown */
+/* =========================================
+   Dropdown Select
+   ========================================= */
 .custom-select {
   position: relative;
-  min-width: 250px;
+  width: 100%;
 }
 
 select {
   width: 100%;
-  background-color: var(--input-bg);
+  background-color: transparent; 
   border: 1px solid var(--border-color);
   color: var(--text-white);
-  padding: 12px 16px;
+  padding: 12px 15px;
+  padding-right: 40px;
   border-radius: 8px;
   appearance: none;
   outline: none;
   cursor: pointer;
-  font-size: 0.95rem;
-  height: 48px;
   transition: all 0.3s;
+  font-size: 0.95rem;
 }
 
 select:focus {
   border-color: var(--primary-red);
   box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.1);
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+select option {
+  background-color: var(--card-bg); 
+  color: var(--text-white);         
+  padding: 12px;
 }
 
 .select-arrow {
@@ -271,50 +249,113 @@ select:focus {
   transform: translateY(-50%);
   pointer-events: none;
   color: var(--text-gray);
+  font-size: 1rem;
 }
 
-/* --- NOTIFICATION AREA --- */
-.notification-container {
-  min-height: 60px;
+/* =========================================
+   Buttons
+   ========================================= */
+.btn-secondary {
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
   display: flex;
+  align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  gap: 8px;
+  font-size: 0.9rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--text-gray);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary-red);
+  color: var(--text-white);
+  background-color: rgba(229, 57, 53, 0.1);
+}
+
+.btn-primary {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary-gradient);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--primary-glow);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 25px rgba(229, 57, 53, 0.7);
+}
+
+/* =========================================
+   Notification (Updated Position)
+   ========================================= */
+.notification-container {
+  position: absolute; /* Takes it out of flow */
+  top: 60px;          /* Positions it slightly below navbar, but "upper" */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  pointer-events: none; /* Let clicks pass through if invisible */
 }
 
 .success-toast {
-  background-color: rgba(16, 185, 129, 0.15);
-  border: 1px solid var(--success-color);
-  color: var(--success-color);
+  pointer-events: auto;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(6, 78, 59, 0.9) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  border-left: 5px solid #10b981;
+  color: #ffffff;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-weight: 500;
-  box-shadow: var(--success-glow);
-  backdrop-filter: blur(5px);
-  animation: slideUpFade 0.5s ease-out forwards;
-  opacity: 1;
-  transform: translateY(0);
+  font-size: 0.9rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  backdrop-filter: blur(12px);
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
 }
 
-@keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes popIn {
+  0% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* --- DATA TABLE CARD --- */
+/* =========================================
+   Data Card (Flex Layout for Internal Scroll)
+   ========================================= */
 .data-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 16px;
-  padding: 30px;
+  padding: 0; /* Removing padding to let table flush with edges if needed, or manage via inner div */
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /* Prevents card from spilling over */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Takes up all remaining vertical space */
+  margin-bottom: 20px; /* Small bottom margin */
 }
 
-/* Top Red Gradient Line */
 .data-card::before {
   content: '';
   position: absolute;
@@ -323,41 +364,52 @@ select:focus {
   width: 100%;
   height: 2px;
   background: linear-gradient(90deg, transparent, var(--primary-red), transparent);
+  z-index: 20;
 }
 
 .card-header {
-  margin-bottom: 25px;
+  padding: 20px 25px;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0; /* Header stays fixed size */
 }
 
 .card-header h2 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  color: var(--text-white);
+  margin: 0;
 }
 
-/* Table Responsive Container */
+/* =========================================
+   Scrollable Table Area
+   ========================================= */
+.table-wrapper {
+  flex-grow: 1; /* Fills the rest of the card */
+  overflow: hidden; /* Contains the scrollable area */
+  position: relative;
+}
+
 .table-responsive {
+  height: 100%;     /* Fills wrapper */
   width: 100%;
-  overflow-x: auto;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  overflow-y: auto; /* ENABLE VERTICAL SCROLL HERE */
+  overflow-x: auto; /* Horizontal scroll if needed */
 }
 
-/* Custom Scrollbar for the table container */
+/* Custom Scrollbar Styling */
 .table-responsive::-webkit-scrollbar {
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
-
 .table-responsive::-webkit-scrollbar-track {
-  background: var(--bg-color);
-  border-radius: 8px;
+  background: #1a1a1a;
 }
-
 .table-responsive::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 8px;
+  background: #333;
+  border-radius: 5px;
+  border: 2px solid #1a1a1a;
 }
-
 .table-responsive::-webkit-scrollbar-thumb:hover {
   background: var(--primary-red);
 }
@@ -370,19 +422,22 @@ table {
 }
 
 th, td {
-  padding: 15px 20px;
+  padding: 15px 25px;
   border-bottom: 1px solid var(--border-color);
 }
 
 thead th {
-  background-color: rgba(255,255,255,0.05);
+  background-color: #1a1a1a; /* Dark background for sticky header */
   color: var(--text-gray);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+  /* STICKY HEADER MAGIC */
   position: sticky;
   top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 tbody tr {
@@ -399,23 +454,18 @@ tbody td {
   color: var(--text-white);
 }
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
+/* =========================================
+   Responsive Design
+   ========================================= */
+@media (max-width: 900px) {
   .nav-bar {
-    flex-direction: column;
-    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 15px;
   }
-  
-  .nav-group { 
-    width: 100%; 
-  }
-  
-  .btn-secondary, .btn-primary, .custom-select { 
-    width: 100%; 
-  }
-  
-  .data-card { 
-    padding: 20px; 
+  .nav-group.center-group {
+    order: 3;
+    width: 100%;
+    margin: 10px 0 0 0;
   }
 }
 </style>
