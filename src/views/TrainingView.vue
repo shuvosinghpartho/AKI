@@ -136,8 +136,8 @@
              </div>
 
              <button class="train-btn" :disabled="!selectedTarget || isTraining" @click="startTraining">
-                <ion-icon name="play-circle-outline"></ion-icon>
-                {{ isTraining ? 'Training...' : 'Start Training' }}
+                <ion-icon name="play-circle-outline" style="font-size: 1.2rem;"></ion-icon>
+                <span>{{ isTraining ? 'Training...' : 'START TRAINING' }}</span>
              </button>
 
           </div>
@@ -273,7 +273,7 @@ export default {
 </script>
 
 <style scoped>
-/* --- DESIGN TOKENS (Exact copy from CleaningView) --- */
+/* --- DESIGN TOKENS --- */
 :host {
   --bg-deep: #050505;
   --bg-glass: rgba(20, 20, 20, 0.75);
@@ -371,19 +371,19 @@ export default {
 }
 
 .tool-header {
-  padding: 10px 12px;
+  padding: 12px 14px; 
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
   color: #aaa;
-  font-size: 0.8rem;
+  font-size: 0.85rem; 
   font-weight: 500;
   transition: 0.2s;
-  min-height: 45px;
+  min-height: 50px; 
 }
 
-.tool-header ion-icon { font-size: 1rem; color: var(--aki-primary); flex-shrink: 0; }
+.tool-header ion-icon { font-size: 1.1rem; color: var(--aki-primary); flex-shrink: 0; }
 .tool-item:hover { background: rgba(255,255,255,0.05); }
 .tool-item.active { border-color: rgba(0, 240, 255, 0.4); background: var(--aki-primary-dim); }
 .tool-item.active .tool-header { color: white; }
@@ -405,8 +405,9 @@ export default {
 /* --- CUSTOM TRAINING SIDEBAR LIST --- */
 .model-list { display: flex; flex-direction: column; gap: 4px; }
 .model-option {
-  padding: 8px; border-radius: 4px; cursor: pointer; color: #888;
-  display: flex; align-items: center; gap: 10px; font-size: 0.75rem;
+  padding: 10px; 
+  border-radius: 4px; cursor: pointer; color: #888;
+  display: flex; align-items: center; gap: 10px; font-size: 0.8rem; 
   transition: 0.2s;
 }
 .model-option:hover { background: rgba(255,255,255,0.05); color: white; }
@@ -423,7 +424,7 @@ export default {
   width: 100%;
   background: var(--aki-danger);
   color: white;
-  padding: 10px;
+  padding: 14px; 
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -431,8 +432,9 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 0.8rem;
+  font-size: 0.9rem; 
   font-weight: 700;
+  letter-spacing: 0.5px;
   box-shadow: 0 4px 15px rgba(255, 42, 109, 0.2);
   transition: 0.2s;
 }
@@ -548,14 +550,35 @@ export default {
 }
 .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
+/* --- ENHANCED TRAIN BUTTON --- */
 .train-btn {
-  margin-top: auto; background: var(--aki-primary); color: #000; border: none;
-  padding: 12px; border-radius: 6px; font-weight: 700; cursor: pointer;
+  margin-top: auto; 
+  background: linear-gradient(90deg, var(--aki-primary) 0%, #00C2CE 100%); 
+  color: white; /* Changed from black to white */
+  border: none;
+  padding: 14px; 
+  border-radius: 6px; 
+  font-weight: 800; 
+  cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: 10px;
-  transition: 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 240, 255, 0.2); 
 }
-.train-btn:hover:not(:disabled) { box-shadow: 0 0 15px var(--aki-primary-dim); transform: translateY(-1px); }
-.train-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Hover Effect with Pop & Glow */
+.train-btn:hover:not(:disabled) { 
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.6); 
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.1);
+}
+
+.train-btn:disabled { 
+  background: #333; 
+  color: #777; 
+  opacity: 0.7; 
+  cursor: not-allowed; 
+  box-shadow: none; 
+}
 
 /* Performance Elements */
 .status-badge { font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; color: #aaa; }
