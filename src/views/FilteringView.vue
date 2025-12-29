@@ -13,16 +13,56 @@
         <div class="tool-item" :class="{ active: activeTool === 'price' }">
           <div class="tool-header" @click="toggleTool('price')">
             <ion-icon name="cash-outline"></ion-icon>
-            <span class="tool-label">Price Range</span>
+            <span class="tool-label">Filter</span>
             <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
           </div>
           <div class="tool-content" :style="{ maxHeight: activeTool === 'price' ? '500px' : '0' }">
             <div class="form-pad hide-on-collapse">
-              <label class="sub-label">Min / Max Price</label>
-              <div style="padding: 10px; border: 1px dashed #444; border-radius: 6px; text-align: center; color: #666; font-size: 0.7rem;">
-                [Price Slider Component Placeholder]
+              
+              <div class="filter-ui-group">
+                <label class="custom-checkbox">
+                  <input type="checkbox" v-model="filters.price.manual">
+                  <span class="checkmark"></span>
+                  <span class="cb-label">Input Manually for Item</span>
+                </label>
+
+                <div class="range-summary">
+                  Min = {{ filters.price.min.toFixed(1) }} , Max = {{ filters.price.max.toFixed(1) }}
+                </div>
+
+                <div class="slider-container">
+                  <div class="slider-labels">
+                    <span class="val-current" style="color: var(--aki-primary);">Min = {{ filters.price.min.toFixed(2) }}</span>
+                    <span class="val-limit">{{ filters.price.limit.toFixed(2) }}</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    v-model.number="filters.price.min" 
+                    min="0" 
+                    :max="filters.price.limit" 
+                    step="0.01"
+                    class="aki-range"
+                    :style="getSliderBackground(filters.price.min, filters.price.limit)"
+                  >
+                </div>
+
+                <div class="slider-container">
+                  <div class="slider-labels">
+                    <span class="val-current" style="color: var(--aki-primary);">Max = {{ filters.price.max.toFixed(2) }}</span>
+                    <span class="val-limit">{{ filters.price.limit.toFixed(2) }}</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    v-model.number="filters.price.max" 
+                    min="0" 
+                    :max="filters.price.limit" 
+                    step="0.01"
+                    class="aki-range"
+                    :style="getSliderBackground(filters.price.max, filters.price.limit)"
+                  >
+                </div>
               </div>
-            </div>
+              </div>
           </div>
         </div>
 
@@ -172,11 +212,19 @@ export default {
   name: 'FilteringView',
   data() {
     return {
-      // Structural state (Matches CleaningView)
       isCollapsed: false,
-      activeTool: 'price', // Default open tool
+      activeTool: 'price',
+      
+      // New state for filters
+      filters: {
+        price: {
+          manual: false,
+          min: 0.50,
+          max: 0.80,
+          limit: 1.00
+        }
+      },
 
-      // Legacy Data (Kept for table rendering, but logic is paused)
       rawData: [
         [13300000, 7420, 4, 2, 3, 'yes'],
         [12250000, 8960, 4, 4, 4, 'yes'],
@@ -194,7 +242,6 @@ export default {
     }
   },
   methods: {
-    // UI Structure Methods
     toggleSidebar() {
       this.isCollapsed = !this.isCollapsed
       if(this.isCollapsed) {
@@ -220,7 +267,14 @@ export default {
       return cell
     },
 
-    // Navigation
+    // Helper to color the slider track blue before the thumb, dark after
+    getSliderBackground(val, max) {
+      const percentage = (val / max) * 100
+      return {
+        background: `linear-gradient(to right, var(--aki-primary) 0%, var(--aki-primary) ${percentage}%, #333 ${percentage}%, #333 100%)`
+      }
+    },
+
     goHome() {
       this.$router.push('/')
     },
@@ -233,7 +287,7 @@ export default {
 </script>
 
 <style scoped>
-/* --- DESIGN TOKENS (Exact copy from CleaningView) --- */
+/* --- DESIGN TOKENS --- */
 :host {
   --bg-deep: #050505;
   --bg-glass: rgba(20, 20, 20, 0.75);
@@ -253,7 +307,6 @@ export default {
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
-/* Renamed root class to match file context, but keeps styling */
 .filtering-container {
   background-color: var(--bg-deep);
   background-image: 
@@ -267,7 +320,115 @@ export default {
 }
 
 /* ===========================
-   1. SIDEBAR
+   NEW FILTER UI STYLES
+=========================== */
+.filter-ui-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 5px 0;
+}
+
+/* Checkbox */
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+.checkmark {
+  height: 16px;
+  width: 16px;
+  background-color: transparent;
+  border: 1px solid #666;
+  border-radius: 4px;
+  margin-right: 10px;
+  transition: 0.2s;
+}
+.custom-checkbox:hover input ~ .checkmark { border-color: var(--aki-primary); }
+.custom-checkbox input:checked ~ .checkmark { background-color: transparent; border-color: var(--aki-primary); }
+/* Create the checkmark */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 9px;
+  border: solid var(--aki-primary);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.cb-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #eee;
+}
+
+/* Range Summary */
+.range-summary {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ddd;
+  margin-bottom: 5px;
+}
+
+/* Sliders */
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.val-limit { color: #888; }
+
+.aki-range {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  transition: opacity .2s;
+  cursor: pointer;
+}
+.aki-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #5CA3FF; /* Light Blue Thumb */
+  cursor: pointer;
+  border: 2px solid var(--bg-deep); /* Optional border for contrast */
+  transition: transform 0.1s;
+}
+.aki-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.aki-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #5CA3FF;
+  cursor: pointer;
+  border: none;
+}
+
+/* ===========================
+   SIDEBAR & GENERIC
 =========================== */
 .sidebar {
   width: var(--sidebar-width);
@@ -287,11 +448,7 @@ export default {
 .filtering-container.collapsed .sidebar { width: var(--sidebar-collapsed); }
 .filtering-container.collapsed .hide-on-collapse { opacity: 0; pointer-events: none; display: none; }
 
-/* Logo */
-.logo-container {
-  padding: 0 20px 20px 20px;
-  white-space: nowrap;
-}
+.logo-container { padding: 0 20px 20px 20px; white-space: nowrap; }
 .logo-text {
   font-weight: 800;
   font-size: 0.85rem;
@@ -302,7 +459,6 @@ export default {
 }
 .filtering-container.collapsed .logo-container { padding: 0 0 20px 0; text-align: center; }
 
-/* Tools Wrapper */
 .tools-wrapper {
   flex: 1;
   overflow-y: auto;
@@ -322,7 +478,6 @@ export default {
   padding-left: 4px;
 }
 
-/* Accordion Item */
 .tool-item {
   border: 1px solid var(--border-glass);
   background: rgba(255,255,255,0.02);
@@ -352,7 +507,6 @@ export default {
 .filtering-container.collapsed .tool-header { justify-content: center; padding: 12px 0; }
 .filtering-container.collapsed .tool-label, .filtering-container.collapsed .chevron { display: none; }
 
-/* Tool Content Form */
 .tool-content {
   max-height: 0;
   overflow: hidden;
@@ -363,7 +517,6 @@ export default {
 
 .form-pad { padding: 15px 12px; }
 
-/* --- INPUTS & LABELS --- */
 .sub-label { 
   display: block; 
   font-size: 0.75rem; 
@@ -372,7 +525,6 @@ export default {
   font-weight: 500;
 }
 
-/* Sidebar Footer */
 .sidebar-footer {
   margin-top: auto;
   padding: 15px 12px;
@@ -399,7 +551,7 @@ export default {
 .filtering-container.collapsed .nav-next span { display: none; }
 
 /* ===========================
-   2. MAIN VIEW
+   MAIN VIEW
 =========================== */
 .main-view {
   flex: 1;
@@ -421,10 +573,9 @@ export default {
 .header-left { display: flex; align-items: center; gap: 20px; z-index: 2; }
 .header-right { display: flex; align-items: center; gap: 15px; z-index: 2; }
 
-/* === HEADER CENTER (PIPELINE) === */
 .header-center {
   position: absolute;
-  left: 42%; /* MOVED LEFT from 50% */
+  left: 42%;
   transform: translateX(-50%);
   z-index: 1;
 }
