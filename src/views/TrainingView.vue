@@ -47,7 +47,6 @@
             </div>
           </div>
         </div>
-
       </div>
 
       <div class="sidebar-footer">

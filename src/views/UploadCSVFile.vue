@@ -1,97 +1,115 @@
 <template>
-  <div class="upload-csv-container">
-    <div class="container">
-      <!-- Header Actions -->
-      <div class="header-actions">
-        <button class="btn-secondary" @click="logout">
-          <ion-icon name="log-out-outline"></ion-icon>
-          Logout
-        </button>
-        <button class="btn-secondary" @click="viewProfile">
-          <ion-icon name="person-outline"></ion-icon>
-          Profile
-        </button>
-      </div>
+  <div class="lucrative-dashboard">
+    <div class="ambient-light light-1"></div>
+    <div class="ambient-light light-2"></div>
 
-      <!-- Main Card -->
-      <div class="main-card">
-        <div class="title-section">
-          <h1>Project Initialization</h1>
-          <p>Select an existing node or upload data to create a new one.</p>
+    <div class="glass-container">
+      
+      <header class="dashboard-header">
+        <div class="brand">
+          <div class="logo-box">
+            <ion-icon name="prism-outline"></ion-icon>
+          </div>
+          <div class="brand-text">
+            <h1>AKI</h1>
+            <small>Artificial Kinetic Intelligence</small>
+          </div>
         </div>
 
-        <div class="selection-grid">
-          <!-- Left Column: Use Existing Project -->
-          <div class="column">
-            <div class="section-title">
-              <ion-icon name="folder-open-outline"></ion-icon>
-              Use Existing Project
-            </div>
-            <div class="custom-select-wrapper">
-              <select 
-                id="projectSelect" 
-                v-model="selectedProject" 
-                @change="clearUpload">
-                <option value="" disabled>-- Select a Project --</option>
+        <div class="header-buttons">
+          <button class="btn-gradient small" @click="viewProfile">
+            <ion-icon name="person"></ion-icon>
+            <span>Profile</span>
+          </button>
+          <button class="btn-gradient small" @click="logout">
+            <ion-icon name="power"></ion-icon>
+            <span>Logout</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="content-grid">
+        
+        <section class="panel left-panel">
+          <div class="panel-header">
+            <h2>Select Node</h2>
+            <p>Choose an existing neural configuration.</p>
+          </div>
+
+          <div class="control-group">
+            <label>Active Projects</label>
+            <div class="select-wrapper">
+              <select v-model="selectedProject" @change="clearUpload">
+                <option value="" disabled>-- Select Stream --</option>
                 <option value="demo">Demo Project (Regression)</option>
                 <option value="vision">Vision V1 (Classification)</option>
                 <option value="signal">Signal Test 04 (Processing)</option>
               </select>
-              <ion-icon name="chevron-down-outline" class="select-arrow"></ion-icon>
+              <ion-icon name="chevron-down" class="arrow"></ion-icon>
             </div>
           </div>
 
-          <!-- Right Column: Create New Project -->
-          <div class="column">
-            <div class="section-title">
-              <ion-icon name="add-circle-outline"></ion-icon>
-              Create New Project
+          <div class="control-group grow">
+            <label>Objectives / Notes</label>
+            <textarea 
+              v-model="projectDescription" 
+              placeholder="Define processing parameters..."
+            ></textarea>
+          </div>
+        </section>
+
+        <div class="orb-divider">
+          <div class="line"></div>
+          <div class="orb">OR</div>
+          <div class="line"></div>
+        </div>
+
+        <section class="panel right-panel">
+          <div class="panel-header">
+            <h2>Upload Data</h2>
+            <p>Ingest raw CSV or XLSX datasets.</p>
+          </div>
+
+          <label 
+            class="cyber-dropzone" 
+            :class="{ 'active': uploadedFile }"
+            for="file-input"
+          >
+            <div class="glow-border"></div>
+            <div class="drop-content">
+              <div class="icon-stack">
+                <ion-icon name="cloud-upload-outline" class="bg-icon"></ion-icon>
+                <ion-icon name="cloud-upload" class="fg-icon"></ion-icon>
+              </div>
+              
+              <div v-if="!uploadedFile" class="text-stack">
+                <span class="primary-text">Drag & Drop Dataset</span>
+                <span class="secondary-text">or click to browse local files</span>
+              </div>
+
+              <div v-else class="file-success">
+                <ion-icon name="document-text"></ion-icon>
+                <span class="filename">{{ uploadedFile.name }}</span>
+                <span class="filesize">Ready for ingestion</span>
+              </div>
             </div>
-            
-            <label for="file-input" class="upload-area" id="drop-zone">
-              <ion-icon name="cloud-upload-outline" class="upload-icon" :class="{ 'uploaded': uploadedFile }"></ion-icon>
-              <div class="default-msg" v-if="!uploadedFile">
-                <span class="upload-text"><strong>Click to upload</strong> or drag and drop</span>
-                <div style="font-size: 0.8rem; color: #666; margin-top: 5px;">Excel (.xlsx) or CSV</div>
-              </div>
-              <div class="file-name-display" v-if="uploadedFile">
-                {{ uploadedFile.name }}
-              </div>
-            </label>
-            <input 
-              type="file" 
-              id="file-input" 
-              accept=".csv, .xlsx, .xls"
-              @change="handleFileSelect"
-              ref="fileInput"
-            >
+          </label>
+          <input type="file" id="file-input" accept=".csv, .xlsx" @change="handleFileSelect" ref="fileInput">
+
+          <div class="action-area">
+             <div class="info-tag">
+               <ion-icon name="scan-outline"></ion-icon>
+               <span>Type: {{ problemTypeShort }}</span>
+             </div>
+
+             <button class="btn-gradient large" @click="submitProject">
+                <span>Initialize Processing</span>
+                <ion-icon name="rocket-outline"></ion-icon>
+             </button>
           </div>
-        </div>
+        </section>
 
-        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
-
-        <!-- Description Section -->
-        <div class="desc-section">
-          <label>Project Description (Optional)</label>
-          <textarea 
-            v-model="projectDescription"
-            placeholder="Describe the objectives of this kinetic model..."
-          ></textarea>
-        </div>
-
-        <!-- Footer Section -->
-        <div class="footer-section">
-          <div class="problem-type-badge">
-            <ion-icon name="analytics-outline"></ion-icon>
-            <span>{{ problemTypeText }}</span>
-          </div>
-
-          <button class="btn-cta" @click="submitProject">
-            Begin Data Processing 
-            <ion-icon name="hardware-chip-outline"></ion-icon>
-          </button>
-        </div>
-      </div>
+      </main>
     </div>
   </div>
 </template>
@@ -104,7 +122,7 @@ export default {
       selectedProject: '',
       uploadedFile: null,
       projectDescription: '',
-      problemTypeText: 'Problem Type: Waiting for selection...'
+      problemTypeShort: 'WAITING INPUT'
     }
   },
   methods: {
@@ -113,437 +131,431 @@ export default {
       if (file) {
         this.uploadedFile = file
         this.selectedProject = ''
-        this.updateProblemType('New Data (Analysis Pending)')
+        this.problemTypeShort = 'NEW ANALYSIS'
       }
     },
-
     clearUpload() {
       this.uploadedFile = null
       this.$refs.fileInput.value = ''
-      this.updateProblemTypeForProject()
+      this.updateProblemType()
     },
-
-    updateProblemType(type) {
-      this.problemTypeText = `Problem Type: ${type}`
+    updateProblemType() {
+      if (this.selectedProject === 'demo') this.problemTypeShort = 'REGRESSION'
+      else if (this.selectedProject === 'vision') this.problemTypeShort = 'CLASSIFICATION'
+      else if (this.selectedProject === 'signal') this.problemTypeShort = 'SIGNAL PROC'
+      else this.problemTypeShort = 'WAITING INPUT'
     },
-
-    updateProblemTypeForProject() {
-      if (this.selectedProject === 'demo') {
-        this.updateProblemType('Regression')
-      } else if (this.selectedProject === 'vision') {
-        this.updateProblemType('Classification')
-      } else if (this.selectedProject === 'signal') {
-        this.updateProblemType('Processing')
-      } else {
-        this.updateProblemType('Waiting for selection...')
-      }
-    },
-
     submitProject() {
-      const hasFile = this.uploadedFile !== null
-      const hasSelection = this.selectedProject !== ''
-
-      if (!hasFile && !hasSelection) {
-        alert("Please select an existing project OR upload a file.")
+      if (!this.uploadedFile && !this.selectedProject) {
+        alert("Action Required: Select a project or upload a file.")
         return
       }
-
-      // Store project data for the next step
       const projectData = {
-        type: hasFile ? 'new-upload' : 'existing-project',
-        source: hasFile ? this.uploadedFile.name : this.selectedProject,
+        type: this.uploadedFile ? 'new-upload' : 'existing-project',
+        source: this.uploadedFile ? this.uploadedFile.name : this.selectedProject,
         description: this.projectDescription,
         timestamp: new Date().toISOString()
       }
-
-      // Store in sessionStorage for the next component
       sessionStorage.setItem('projectData', JSON.stringify(projectData))
-
-      // Navigate to data processing
       this.$router.push('/data-processing')
     },
-
-    logout() {
-      // Implement logout logic here
-      console.log('Logging out...')
-      this.$router.push('/signin')
-    },
-
-    viewProfile() {
-      // Implement profile view logic here
-      console.log('Viewing profile...')
-      alert('Profile view would open here')
-    }
+    logout() { this.$router.push('/signin') },
+    viewProfile() { console.log('Viewing profile...') }
   },
   watch: {
-    selectedProject() {
-      this.updateProblemTypeForProject()
-    }
-  },
-  mounted() {
-    // Check if we have project data from previous navigation
-    const storedData = sessionStorage.getItem('projectData')
-    if (storedData) {
-      try {
-        const projectData = JSON.parse(storedData)
-        console.log('Found stored project data:', projectData)
-        // Clear the stored data after reading
-        sessionStorage.removeItem('projectData')
-      } catch (error) {
-        console.error('Error parsing stored project data:', error)
-      }
-    }
+    selectedProject() { this.updateProblemType() }
   }
 }
 </script>
 
 <style scoped>
-/* =========================================
-   Global/Container Styles
-   ========================================= */
-.upload-csv-container {
-  /* Define Variables locally for this scope */
-  --bg-color: #0d0d0d;
-  --card-bg: #141414;
-  --input-bg: #1f1f1f;
-  --primary-gradient: linear-gradient(135deg, #d32f2f 0%, #ff5252 100%);
-  --primary-glow: 0 4px 20px rgba(229, 57, 53, 0.5);
-  --primary-red: #e53935;
-  --text-white: #ffffff;
-  --text-gray: #a1a1aa;
-  --border-color: #333333;
-  --success-color: #10b981;
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
 
-  background-color: var(--bg-color);
-  color: var(--text-white);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  background-image: radial-gradient(circle at 50% -20%, rgba(229, 57, 53, 0.15), transparent 50%);
-}
-
-.container {
-  width: 100%;
-  max-width: 1000px;
-  animation: fadeIn 0.8s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* =========================================
-   Header & Actions
-   ========================================= */
-.header-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 15px;
-  margin-bottom: 25px;
-}
-
-.btn-secondary {
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
-  background-color: rgba(255, 255, 255, 0.03);
-  color: var(--text-gray);
-  border: 1px solid var(--border-color);
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-  border-color: var(--primary-red);
-  color: var(--text-white);
-  background-color: rgba(229, 57, 53, 0.1);
-  transform: translateY(-2px);
-}
-
-/* =========================================
-   Main Card Styling
-   ========================================= */
-.main-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 40px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+/* ============================
+   Variables & Reset
+   ============================ */
+.lucrative-dashboard {
+  --bg-deep: #050505;
+  --glass-bg: rgba(20, 20, 20, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  
+  /* The "Eye-Catchy" Gradient Scheme */
+  --neon-start: #ff416c;
+  --neon-end: #ff4b2b;
+  --neon-glow: rgba(255, 75, 43, 0.4);
+  
+  --text-main: #ffffff;
+  --text-muted: #8b8b95;
+  
+  font-family: 'Outfit', sans-serif;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-deep);
+  color: var(--text-main);
   position: relative;
   display: flex;
-  flex-direction: column;
-}
-
-/* Top Red Line Decoration */
-.main-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--primary-red), transparent);
-}
-
-.title-section {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.title-section h1 {
-  font-size: 2rem;
-  margin-bottom: 10px;
-  background: linear-gradient(to bottom, #ffffff, #a1a1aa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.title-section p { 
-  color: var(--text-gray); 
-}
-
-/* =========================================
-   Selection Grid Layout
-   ========================================= */
-.selection-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 30px;
-  position: relative;
-}
-
-.selection-grid::after {
-  content: "";
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  height: 80%;
-  width: 1px;
-  background-color: var(--border-color);
-  transform: translateX(-50%);
-}
-
-.section-title {
-  font-size: 1.1rem;
-  margin-bottom: 15px;
-  color: var(--text-white);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.section-title ion-icon { 
-  color: var(--primary-red); 
-}
-
-/* =========================================
-   Dropdown / Select Styles (UPDATED)
-   ========================================= */
-.custom-select-wrapper { 
-  position: relative; 
-}
-
-select {
-  width: 100%;
-  background-color: var(--input-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-white);
-  padding: 15px;
-  border-radius: 8px;
-  appearance: none;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-select:focus {
-  border-color: var(--primary-red);
-  box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.1);
-}
-
-/* --- FIX FOR DARK OPTIONS --- */
-select option {
-  background-color: var(--card-bg); /* Sets dropdown background to dark gray */
-  color: var(--text-white);         /* Sets text to white */
-  padding: 12px;
-}
-
-.select-arrow {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: var(--text-gray);
-}
-
-/* =========================================
-   Upload Area
-   ========================================= */
-.upload-area {
-  border: 2px dashed var(--border-color);
-  background: linear-gradient(180deg, rgba(255,255,255,0.01) 0%, rgba(255,255,255,0.03) 100%);
-  border-radius: 10px;
-  padding: 30px 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  min-height: 150px;
+  align-items: center;
 }
 
-.upload-area:hover {
-  border-color: var(--primary-red);
-  background: rgba(229, 57, 53, 0.05);
-  box-shadow: 0 0 15px rgba(229, 57, 53, 0.1);
+/* ============================
+   Ambient Background Animation
+   ============================ */
+.ambient-light {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  opacity: 0.4;
+  animation: float 10s infinite alternate ease-in-out;
 }
 
-.upload-icon {
-  font-size: 2.5rem;
-  color: var(--text-gray);
-  margin-bottom: 10px;
-  transition: transform 0.3s, color 0.3s;
+.light-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--neon-start), transparent);
+  top: -100px;
+  left: -100px;
 }
 
-.upload-icon.uploaded {
-  color: var(--success-color);
-  transform: scale(1.1);
+.light-2 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #4200ff, transparent);
+  bottom: -150px;
+  right: -150px;
+  animation-delay: -5s;
 }
 
-.upload-area:hover .upload-icon {
-  color: var(--primary-red);
-  transform: scale(1.1);
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, 50px) scale(1.1); }
 }
 
-.upload-text { 
-  color: var(--text-gray); 
-  font-size: 0.9rem; 
-}
-
-.upload-text strong { 
-  color: var(--primary-red); 
-}
-
-#file-input { 
-  display: none; 
-}
-
-.file-name-display {
-  margin-top: 10px;
-  font-weight: 600;
-  color: var(--text-white);
-  display: block;
-}
-
-/* =========================================
-   Description & Inputs
-   ========================================= */
-.desc-section { 
-  margin-top: 20px; 
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--text-gray);
-  font-size: 0.9rem;
-}
-
-textarea {
-  width: 100%;
-  background-color: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text-white);
-  padding: 15px;
-  height: 100px;
-  resize: none;
-  outline: none;
-  transition: 0.3s;
-}
-
-textarea:focus {
-  border-color: var(--primary-red);
-  box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.1);
-}
-
-/* =========================================
-   Footer & Buttons
-   ========================================= */
-.footer-section {
+/* ============================
+   Main Glass Container
+   ============================ */
+.glass-container {
+  width: 95%;
+  height: 92%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  margin-top: 30px;
-}
-
-.problem-type-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--primary-red);
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.btn-cta {
-  width: 100%;
-  padding: 18px;
-  border-radius: 10px;
-  border: none;
-  background: var(--primary-gradient);
-  color: white;
-  font-size: 1.1rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  box-shadow: var(--primary-glow);
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
+  z-index: 10;
   position: relative;
   overflow: hidden;
 }
 
-.btn-cta:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(229, 57, 53, 0.6);
+/* ============================
+   Header
+   ============================ */
+.dashboard-header {
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  border-bottom: 1px solid var(--glass-border);
 }
 
-.btn-cta:active {
-  transform: translateY(1px);
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.btn-cta ion-icon {
-  font-size: 1.4rem;
+.logo-box {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, var(--neon-start), var(--neon-end));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 20px var(--neon-glow);
 }
 
-/* =========================================
-   Responsive Design
-   ========================================= */
-@media (max-width: 768px) {
-  .selection-grid { 
-    grid-template-columns: 1fr; 
-  }
-  
-  .selection-grid::after { 
-    display: none; 
-  }
+.brand-text h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.brand-text .highlight { color: var(--neon-start); }
+.brand-text small { color: var(--text-muted); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
+
+.header-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+/* ============================
+   The Universal Button Style
+   ============================ */
+.btn-gradient {
+  background: linear-gradient(135deg, var(--neon-start) 0%, var(--neon-end) 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px var(--neon-glow);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 1;
+}
+
+/* Shine Effect */
+.btn-gradient::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: 0.5s;
+  z-index: -1;
+}
+
+.btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px var(--neon-glow);
+}
+
+.btn-gradient:hover::before { left: 100%; }
+.btn-gradient:active { transform: translateY(1px); }
+
+/* Sizes */
+.btn-gradient.small {
+  padding: 10px 20px;
+  font-size: 0.8rem;
+  height: 40px;
+}
+
+.btn-gradient.large {
+  width: 100%;
+  padding: 18px;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+/* ============================
+   Main Content Layout
+   ============================ */
+.content-grid {
+  flex: 1;
+  display: flex;
+  padding: 40px;
+  gap: 40px;
+}
+
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header { margin-bottom: 25px; }
+.panel-header h2 { font-size: 1.8rem; font-weight: 600; margin: 0 0 5px 0; }
+.panel-header p { color: var(--text-muted); margin: 0; font-size: 0.95rem; }
+
+/* ============================
+   Inputs (Left Panel)
+   ============================ */
+.control-group { margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px; }
+.control-group.grow { flex: 1; }
+
+label { font-size: 0.8rem; color: var(--neon-start); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+.select-wrapper { position: relative; }
+
+select, textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  color: white;
+  border-radius: 12px;
+  padding: 15px;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: 0.3s;
+  outline: none;
+}
+
+select:focus, textarea:focus {
+  border-color: var(--neon-start);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 15px rgba(255, 65, 108, 0.1);
+}
+
+textarea { height: 100%; resize: none; }
+select { appearance: none; cursor: pointer; }
+select option { background-color: #111; }
+
+.arrow { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+
+/* ============================
+   Divider
+   ============================ */
+.orb-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.orb-divider .line {
+  width: 1px;
+  flex: 1;
+  background: linear-gradient(to bottom, transparent, var(--glass-border), transparent);
+}
+
+.orb-divider .orb {
+  background: rgba(255, 255, 255, 0.05);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+/* ============================
+   Upload Zone (Right Panel)
+   ============================ */
+.cyber-dropzone {
+  flex: 1;
+  position: relative;
+  background: radial-gradient(circle at center, rgba(255, 65, 108, 0.03) 0%, transparent 70%);
+  border-radius: 20px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: 0.3s;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animated Border */
+.glow-border {
+  position: absolute;
+  inset: 0;
+  border: 2px dashed var(--glass-border);
+  border-radius: 20px;
+  transition: 0.3s;
+}
+
+.cyber-dropzone:hover .glow-border, .cyber-dropzone.active .glow-border {
+  border-color: var(--neon-start);
+  box-shadow: inset 0 0 20px rgba(255, 65, 108, 0.1);
+}
+
+.drop-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.icon-stack {
+  position: relative;
+  height: 80px;
+  width: 80px;
+  margin: 0 auto 20px auto;
+}
+
+.bg-icon {
+  font-size: 5rem;
+  color: var(--neon-start);
+  opacity: 0.2;
+  position: absolute;
+  top: 0; left: 0;
+  filter: blur(5px);
+}
+
+.fg-icon {
+  font-size: 5rem;
+  background: linear-gradient(to bottom, #fff, var(--text-muted));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: absolute;
+  top: 0; left: 0;
+}
+
+.text-stack { display: flex; flex-direction: column; gap: 8px; }
+.primary-text { font-size: 1.2rem; font-weight: 600; }
+.secondary-text { font-size: 0.9rem; color: var(--text-muted); }
+
+.file-success {
+  animation: popIn 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.file-success ion-icon { font-size: 3rem; color: #10b981; margin-bottom: 10px; }
+.file-success .filename { font-size: 1.2rem; font-weight: 700; color: white; }
+.file-success .filesize { color: var(--text-muted); font-size: 0.85rem; }
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+#file-input { display: none; }
+
+/* ============================
+   Action Footer
+   ============================ */
+.action-area {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.info-tag {
+  background: rgba(255,255,255,0.05);
+  padding: 0 20px;
+  height: 56px; /* Match button height */
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.info-tag ion-icon { color: var(--neon-start); font-size: 1.2rem; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .content-grid { flex-direction: column; overflow-y: auto; padding: 20px; }
+  .orb-divider { flex-direction: row; width: 100%; height: 40px; }
+  .orb-divider .line { width: auto; height: 1px; }
+  .dashboard-header { padding: 0 20px; }
+  .header-buttons .btn-gradient span { display: none; } /* Hide text on tablets */
 }
 </style>

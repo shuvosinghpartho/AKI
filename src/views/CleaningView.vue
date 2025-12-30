@@ -176,7 +176,7 @@
                   <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
                </div>
                <button class="btn-action danger-btn" style="margin-top:15px;">DELETE COLUMN</button>
-           </div>
+            </div>
          </div>
         </div>
 
@@ -230,9 +230,17 @@
         
         <div class="glass-panel">
           <div class="panel-head">
-            <span class="panel-label" style="color: #ffcc00;">● RAW DATA</span>
+            <span class="panel-label" style="color: var(--aki-primary);">Before Cleaning</span>
             <ion-icon name="expand-outline" style="color:#666;"></ion-icon>
           </div>
+          
+          <div class="sub-tabs">
+            <span class="tab" :class="{ active: activeTabLeft === 'preview' }" @click="activeTabLeft = 'preview'">Preview</span>
+            <span class="tab" :class="{ active: activeTabLeft === 'info' }" @click="activeTabLeft = 'info'">Info</span>
+            <span class="tab" :class="{ active: activeTabLeft === 'features' }" @click="activeTabLeft = 'features'">Features</span>
+            <span class="tab" :class="{ active: activeTabLeft === 'describe' }" @click="activeTabLeft = 'describe'">Describe</span>
+          </div>
+
           <div class="table-wrap">
             <table id="table-before">
               <thead>
@@ -259,9 +267,17 @@
 
         <div class="glass-panel">
           <div class="panel-head">
-            <span class="panel-label" style="color: var(--aki-primary);">● TRANSFORMED</span>
+            <span class="panel-label" style="color: var(--aki-primary);">After Cleaning</span>
             <ion-icon name="download-outline" style="color:#666; cursor: pointer;" @click="downloadTransformed"></ion-icon>
           </div>
+
+          <div class="sub-tabs">
+            <span class="tab" :class="{ active: activeTabRight === 'preview' }" @click="activeTabRight = 'preview'">Preview</span>
+            <span class="tab" :class="{ active: activeTabRight === 'info' }" @click="activeTabRight = 'info'">Info</span>
+            <span class="tab" :class="{ active: activeTabRight === 'features' }" @click="activeTabRight = 'features'">Features</span>
+            <span class="tab" :class="{ active: activeTabRight === 'describe' }" @click="activeTabRight = 'describe'">Describe</span>
+          </div>
+
           <div class="table-wrap">
             <table id="table-after">
               <thead>
@@ -298,6 +314,10 @@ export default {
     return {
       isCollapsed: false,
       activeTool: 'rename', 
+      
+      // === SEPARATED STATE VARIABLES ===
+      activeTabLeft: 'preview',  // Controls Raw Data Panel
+      activeTabRight: 'preview', // Controls Transformed Panel
       
       cleaningConfig: {
         column: '',
@@ -773,9 +793,9 @@ select.f-input option {
   padding: 12px 18px;
   background: rgba(255,255,255,0.02);
   border-bottom: 1px solid var(--border-glass);
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex; justify-content: center; align-items: center;
 }
-.panel-label { font-size: 0.8rem; font-weight: 700; color: #ddd; letter-spacing: 0.5px; }
+.panel-label { font-size: 1.3rem; font-weight: 1000; color: #ddd; letter-spacing: 1px; }
 
 .table-wrap { flex: 1; overflow: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 0.75rem; white-space: nowrap; }
@@ -791,4 +811,56 @@ tbody tr:hover { background: rgba(0, 240, 255, 0.03); }
 ::-webkit-scrollbar-track { background: #0a0a0a; }
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* ====================================
+   UPDATED TAB MENU STYLING
+==================================== */
+.sub-tabs {
+  display: flex;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3); /* Darker background strip */
+  border-bottom: 1px solid var(--border-glass);
+  padding: 0; 
+}
+
+.tab {
+  /* THIS MAKES THEM DISTRIBUTE EVENLY */
+  flex: 1; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  padding: 14px 0; /* Vertical height */
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  color: #666; /* Inactive text color */
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.tab:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* --- ACTIVE STATE (Reddish-Orange) --- */
+.tab.active {
+  color: #ff5e00; 
+  background: linear-gradient(to top, rgba(255, 94, 0, 0.05), transparent);
+}
+
+/* Bottom Line Indicator */
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #ff5e00; 
+  box-shadow: 0 -2px 10px rgba(255, 94, 0, 0.5);
+}
 </style>
