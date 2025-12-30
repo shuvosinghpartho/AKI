@@ -74,8 +74,7 @@ export default {
       // Add navigation logic here
     },
     handleSubscription() {
-      console.log('Subscription clicked')
-      // Add subscription logic here
+      this.$router.push('/subscription')
     }
   },
   mounted() {

@@ -50,6 +50,11 @@ const routes = [
     path: '/predict',
     name: 'Predict',
     component: () => import('../views/PredictView.vue')
+  },
+  {
+    path: '/subscription',
+    name: 'Subscription',
+    component: () => import('../views/SubscriptionView.vue')
   }
 ]
 
