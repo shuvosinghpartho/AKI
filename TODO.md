@@ -1,37 +1,26 @@
-# Subscription Page Conversion - TODO
+# UserProfile Conversion Plan
 
-## ✅ Completed Steps
+## Task Summary
+Convert `userProfile.html` to Vue.js component and link it from UploadCSVFile.vue
 
-### Step 1: Create SubscriptionView.vue
-- ✅ Converted HTML template to Vue template syntax
-- ✅ Converted JavaScript functions to Vue methods (selectPlan, togglePaymentModal, closePaymentModal)
-- ✅ Moved inline styles to scoped CSS section
-- ✅ Integrated existing CSS classes from custom.css
-- ✅ Maintained responsive design and animations
-- ✅ File created: `/src/views/SubscriptionView.vue`
+## Status: COMPLETED ✓
 
-### Step 2: Update Router Configuration
-- ✅ Added subscription route to src/router/index.js
-- ✅ Path: '/subscription' 
-- ✅ Component: () => import('../views/SubscriptionView.vue')
+### Files Created:
+1. **src/views/UserProfileView.vue** - Full Vue component with:
+   - Reactive data for user info, stats, projects, donations, login history
+   - Tab switching functionality (Project Info, Donation, Login History, Edit Basic Info)
+   - All methods: goToHome, refreshPage, logout, showAbout, reportProblem, submitTransaction, updateProfile
+   - Scoped CSS matching original design
+   - Sidebar navigation with proper navigation links
 
-### Step 3: Update Navigation Component
-- ✅ Replaced console.log in handleSubscription() method with router navigation
-- ✅ Used this.$router.push('/subscription')
-- ✅ Updated file: `/src/components/Navigation.vue`
+### Files Modified:
+2. **src/views/UploadCSVFile.vue** - Updated `viewProfile()` method:
+   - Changed from `console.log('Viewing profile...')` to `this.$router.push('/user-profile')`
 
-## Features Preserved
-- ✅ 3 pricing tiers (Monthly ৳200, Annual ৳1800, Semester ৳1000)
-- ✅ Payment modal with secure transaction messaging
-- ✅ Card selection functionality with hover effects
-- ✅ "Best Value" badge on annual plan
-- ✅ Ambient background mesh effects
-- ✅ Font Awesome icons integration
-- ✅ Responsive design and glass morphism effects
-- ✅ Brand consistency with --brand-red variable
+3. **src/router/index.js** - Added route:
+   - New route: `/user-profile` → `UserProfile` component
 
-## Testing Status
-- 🔄 Ready for testing: Navigate from home page to subscription page
-- 🔄 Ready for testing: Verify responsive design across different screen sizes
-- 🔄 Ready for testing: Ensure all interactive features work (card selection, modal)
-- 🔄 Ready for testing: Confirm styling consistency with existing design system
+## How it works:
+1. User clicks "Profile" button in UploadCSVFile.vue
+2. `viewProfile()` method navigates to `/user-profile` route
+3. UserProfileView.vue renders with full user profile functionality

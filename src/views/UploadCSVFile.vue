@@ -160,7 +160,7 @@ export default {
       this.$router.push('/data-processing')
     },
     logout() { this.$router.push('/signin') },
-    viewProfile() { console.log('Viewing profile...') }
+    viewProfile() { this.$router.push('/user-profile') }
   },
   watch: {
     selectedProject() { this.updateProblemType() }
