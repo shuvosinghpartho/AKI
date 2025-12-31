@@ -49,182 +49,245 @@
 
         <div class="card">
           <p class="info-text">
-            QRARG operates as a non-profit research organization. Your kind support will help us to grow and provide quality services through educational and research support on AI and ML.
-          </p>
+QRARG operates as a non-profit research organization. Your kind support will help us to grow and provide quality services through educational and research support on AI and ML.          </p>
         </div>
       </div>
 
       <div class="content-split">
         
-        <div class="donation-card">
-          <div class="btn-donate-header">Donate to support us</div>
-          
-          <p class="donation-info">You can donate -</p>
-          <div class="radio-group">
-            <span class="radio-dot"></span>
-            <span>BDT 200+</span>
-          </div>
+        <div class="donation-card-container">
+          <div class="donation-card">
+            <div class="btn-donate-header">Donate to support us</div>
+            
+            <p class="donation-info">You can donate -</p>
+            <div class="radio-group">
+              <span class="radio-dot"></span>
+              <span>BDT 200+</span>
+            </div>
 
-          <p class="donation-info">You will get a new project access. Send your transaction ID (last 4 digits) and press Apply.</p>
-          
-          <div class="payment-details">
-            <span>BKash: +88 01998124416</span>
-          </div>
+            <p class="donation-info">You will get a new project access. Send your transaction ID (last 4 digits) and press Apply.</p>
+            
+            <div class="payment-details">
+              <span>BKash: +88 01998124416</span>
+            </div>
 
-          <div class="input-group">
-            <label class="input-label">Transaction ID</label>
-            <input 
-              type="text" 
-              class="form-input" 
-              placeholder="e.g. 8H3K..."
-              v-model="transactionId"
-            >
-          </div>
+            <div class="input-group">
+              <label class="input-label">Transaction ID</label>
+              <input 
+                type="text" 
+                class="form-input" 
+                placeholder=""
+                v-model="transactionId"
+              >
+            </div>
 
-          <button class="btn-apply" @click="submitTransaction">Apply</button>
+            <button class="btn-apply" @click="submitTransaction">Apply</button>
+          </div>
         </div>
 
-        <div class="tabs-container">
-          <div class="tabs-header">
-            <button 
-              class="tab-btn" 
-              :class="{ active: activeTab === 'projectInfo' }"
-              @click="activeTab = 'projectInfo'"
-            >Project Info</button>
-            <button 
-              class="tab-btn" 
-              :class="{ active: activeTab === 'donation' }"
-              @click="activeTab = 'donation'"
-            >Donation</button>
-            <button 
-              class="tab-btn" 
-              :class="{ active: activeTab === 'loginHistory' }"
-              @click="activeTab = 'loginHistory'"
-            >Login History</button>
-            <button 
-              class="tab-btn" 
-              :class="{ active: activeTab === 'editInfo' }"
-              @click="activeTab = 'editInfo'"
-            >Edit Basic Info</button>
-          </div>
+        <div class="accordion-scroll-container">
+          
+          <div class="accordion-item" :class="{ 'is-open': expandedSection === 'projectInfo' }">
+            <button class="accordion-header" @click="toggleSection('projectInfo')">
+              <span>Project Info</span>
+              <i class="fa-solid fa-chevron-down chevron"></i>
+            </button>
+            
+            <div class="accordion-body" v-show="expandedSection === 'projectInfo'">
+              <div class="body-content">
+                <label class="input-label">Select project to view info:</label>
+                <select class="custom-select" v-model="selectedProject">
+                  <option v-for="project in projects" :key="project" :value="project">{{ project }}</option>
+                </select>
 
-          <div id="projectInfo" class="tab-content" :class="{ active: activeTab === 'projectInfo' }">
-            <label class="input-label">Select project to view info:</label>
-            <select class="custom-select" v-model="selectedProject">
-              <option v-for="project in projects" :key="project" :value="project">{{ project }}</option>
-            </select>
-
-            <div class="project-detail-row">
-              <div class="detail-box">
-                <div class="detail-label">Project Name:</div>
-                <div class="detail-content">{{ selectedProject }}</div>
-              </div>
-              <div class="detail-box">
-                <div class="detail-content">Raw Dataset is uploaded</div>
-              </div>
-              <div class="detail-box">
-                <div class="detail-label">Description:</div>
-                <div class="detail-content">--</div>
-              </div>
-              <div class="detail-box">
-                <div class="detail-content">Modified Dataset is uploaded</div>
-              </div>
-              <div class="detail-box full-width">
-                <div class="detail-label">Problem Type:</div>
-                <div class="detail-content">Classification</div>
+                <div class="project-detail-row">
+                  <div class="detail-box">
+                    <div class="detail-label">Project Name:</div>
+                    <div class="detail-content">{{ selectedProject }}</div>
+                  </div>
+                  <div class="detail-box">
+                    <div class="detail-content">Raw Dataset is uploaded</div>
+                  </div>
+                  <div class="detail-box">
+                    <div class="detail-label">Description:</div>
+                    <div class="detail-content">--</div>
+                  </div>
+                  <div class="detail-box">
+                    <div class="detail-content">Modified Dataset is uploaded</div>
+                  </div>
+                  <div class="detail-box full-width">
+                    <div class="detail-label">Problem Type:</div>
+                    <div class="detail-content">Classification</div>
+                  </div>
+                </div>
+                <p style="margin-top: 20px; color: #888; font-size: 0.9rem;">No interaction history found.</p>
               </div>
             </div>
-            <p style="margin-top: 20px; color: #888; font-size: 0.9rem;">No interaction history found.</p>
           </div>
 
-          <div id="donation" class="tab-content" :class="{ active: activeTab === 'donation' }">
-            <table class="custom-table">
-              <thead>
-                <tr>
-                  <th>Approved?</th>
-                  <th>Plan</th>
-                  <th>Donation Amount</th>
-                  <th>Tx Id</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(donation, index) in donations" :key="index">
-                  <td>
-                    <i 
-                      class="fa-solid fa-square-check" 
-                      :style="{ color: donation.approved ? '#10b981' : '#555' }"
-                    ></i>
-                  </td>
-                  <td>{{ donation.plan }}</td>
-                  <td>{{ donation.amount }}</td>
-                  <td>{{ donation.txId }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div id="loginHistory" class="tab-content" :class="{ active: activeTab === 'loginHistory' }">
-            <table class="custom-table">
-              <thead>
-                <tr>
-                  <th>Project_name</th>
-                  <th>Login Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(login, index) in loginHistory" :key="index">
-                  <td>{{ login.project }}</td>
-                  <td>{{ login.time }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div id="editInfo" class="tab-content" :class="{ active: activeTab === 'editInfo' }">
-            <form @submit.prevent="updateProfile">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label class="input-label">First Name</label>
-                  <input type="text" class="form-input" v-model="editForm.firstName">
-                </div>
-                <div class="form-group">
-                  <label class="input-label">Institution</label>
-                  <input type="text" class="form-input" v-model="editForm.institution" readonly style="opacity: 0.7;">
-                </div>
-                
-                <div class="form-group">
-                  <label class="input-label">Last Name</label>
-                  <input type="text" class="form-input" v-model="editForm.lastName">
-                </div>
-                
-                <div class="form-group row-span-2" style="grid-row: span 2;">
-                  <label class="input-label">Address</label>
-                  <textarea 
-                    class="form-input" 
-                    style="height: 122px; resize: none;"
-                    v-model="editForm.address"
-                  ></textarea>
-                </div>
-
-                <div class="form-group">
-                  <label class="input-label">Date of Birth</label>
-                  <input type="text" class="form-input" v-model="editForm.dob">
-                </div>
-
-                <div class="form-group">
-                  <label class="input-label">Role</label>
-                  <input type="text" class="form-input" v-model="editForm.role" readonly style="opacity: 0.7;">
-                </div>
-                
-                <div class="form-group">
-                  <label class="input-label">Country</label>
-                  <input type="text" class="form-input" v-model="editForm.country">
-                </div>
+          <div class="accordion-item" :class="{ 'is-open': expandedSection === 'donation' }">
+            <button class="accordion-header" @click="toggleSection('donation')">
+              <span>Donation History</span>
+              <i class="fa-solid fa-chevron-down chevron"></i>
+            </button>
+            
+            <div class="accordion-body" v-show="expandedSection === 'donation'">
+              <div class="body-content">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Approved?</th>
+                      <th>Plan</th>
+                      <th>Donation Amount</th>
+                      <th>Tx Id</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(donation, index) in donations" :key="index">
+                      <td>
+                        <i 
+                          class="fa-solid fa-square-check" 
+                          :style="{ color: donation.approved ? '#10b981' : '#555' }"
+                        ></i>
+                      </td>
+                      <td>{{ donation.plan }}</td>
+                      <td>{{ donation.amount }}</td>
+                      <td>{{ donation.txId }}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <button type="submit" class="btn-confirm">Confirm</button>
-            </form>
+            </div>
           </div>
 
+          <div class="accordion-item" :class="{ 'is-open': expandedSection === 'loginHistory' }">
+            <button class="accordion-header" @click="toggleSection('loginHistory')">
+              <span>Login History</span>
+              <i class="fa-solid fa-chevron-down chevron"></i>
+            </button>
+            
+            <div class="accordion-body" v-show="expandedSection === 'loginHistory'">
+              <div class="body-content">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Project_name</th>
+                      <th>Login Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(login, index) in loginHistory" :key="index">
+                      <td>{{ login.project }}</td>
+                      <td>{{ login.time }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item" :class="{ 'is-open': expandedSection === 'editInfo' }">
+            <button class="accordion-header" @click="toggleSection('editInfo')">
+              <span>Edit Basic Info</span>
+              <i class="fa-solid fa-chevron-down chevron"></i>
+            </button>
+            
+            <div class="accordion-body" v-show="expandedSection === 'editInfo'">
+              <div class="body-content">
+                <form @submit.prevent="updateProfile">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="input-label">First Name</label>
+                      <input type="text" class="form-input" v-model="editForm.firstName">
+                    </div>
+                    <div class="form-group">
+                      <label class="input-label">Institution</label>
+                      <input type="text" class="form-input" v-model="editForm.institution" readonly style="opacity: 0.7;">
+                    </div>
+                    
+                    <div class="form-group">
+                      <label class="input-label">Last Name</label>
+                      <input type="text" class="form-input" v-model="editForm.lastName">
+                    </div>
+                    
+                    <div class="form-group row-span-2" style="grid-row: span 2;">
+                      <label class="input-label">Address</label>
+                      <textarea 
+                        class="form-input" 
+                        style="height: 122px; resize: none;"
+                        v-model="editForm.address"
+                      ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="input-label">Date of Birth</label>
+                      <input type="text" class="form-input" v-model="editForm.dob">
+                    </div>
+
+                    <div class="form-group">
+                      <label class="input-label">Role</label>
+                      <input type="text" class="form-input" v-model="editForm.role" readonly style="opacity: 0.7;">
+                    </div>
+                    
+                    <div class="form-group">
+                      <label class="input-label">Country</label>
+                      <input type="text" class="form-input" v-model="editForm.country">
+                    </div>
+                  </div>
+                  <button type="submit" class="btn-confirm">Confirm</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      
+      <div v-if="showAboutModal" class="modal-overlay" @click.self="showAboutModal = false">
+        <div class="modal-box large-box">
+          <div class="modal-header">
+            <h2>About Us</h2>
+            <button class="close-btn" @click="showAboutModal = false">&times;</button>
+          </div>
+          <div class="modal-body about-content">
+            <p class="mb-4">
+              AKI is a comprehensive web application that aims to make <strong>Machine Learning</strong> and <strong>Data Analysis</strong> more accessible to users from all backgrounds. This platform enables users to preprocess data, visualize datasets, and train machine learning models with just a few clicks.
+            </p>
+            
+            <h3 class="section-title">Key Features:</h3>
+            <ul class="feature-list">
+              <li><strong>Data Preprocessing:</strong> Easily preprocess datasets with one-click actions, simplifying tasks like cleaning and transforming data.</li>
+              <li><strong>Visualization:</strong> Generate insightful visualizations to better understand your data and uncover hidden patterns.</li>
+              <li><strong>Automated Machine Learning:</strong> Select machine learning models and adjust parameters for automated workflows that make training models seamless.</li>
+            </ul>
+
+            <h3 class="section-title">Mission</h3>
+            <p class="mb-4">
+              To provide a powerful, intuitive tool that helps users for data analysis and machine learning without writing a single code. This platform empowers you to effortlessly manage the entire machine learning lifecycle.
+            </p>
+
+            <h3 class="section-title">Get Started</h3>
+            <p class="mb-4">Try AKI to see how it simplifies machine learning and data analysis tasks.</p>
+            
+            <p class="footer-note">Thank you for using AKI!</p>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="showReportModal" class="modal-overlay" @click.self="showReportModal = false">
+        <div class="modal-box">
+          <div class="modal-header">
+            <h2>Report a problem/feedback</h2>
+            <button class="close-btn" @click="showReportModal = false">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p style="margin-bottom: 10px; color: #ddd;">Enter your message here:</p>
+            <textarea 
+              v-model="reportMessage" 
+              class="modal-textarea"
+            ></textarea>
+            <button class="btn-modal-send" @click="submitReport">Send</button>
+          </div>
         </div>
       </div>
 
@@ -237,7 +300,13 @@ export default {
   name: 'UserProfile',
   data() {
     return {
-      activeTab: 'projectInfo',
+      // Modal States
+      showAboutModal: false,
+      showReportModal: false,
+      reportMessage: '',
+
+      // Existing Data
+      expandedSection: 'projectInfo',
       transactionId: '',
       selectedProject: 'IEB dataset',
       projects: ['IEB dataset', 'Vision V1', 'Signal Process'],
@@ -278,45 +347,45 @@ export default {
     }
   },
   methods: {
-    goToHome() {
-      this.$router.push('/')
+    toggleSection(sectionName) {
+      if (this.expandedSection === sectionName) {
+        this.expandedSection = null;
+      } else {
+        this.expandedSection = sectionName;
+      }
     },
-    refreshPage() {
-      window.location.reload()
-    },
-    logout() {
-      this.$router.push('/signin')
-    },
+    goToHome() { this.$router.push('/') },
+    refreshPage() { window.location.reload() },
+    logout() { this.$router.push('/signin') },
+    
+    // Updated Methods for Modals
     showAbout() {
-      alert('About Us: QRARG - Non-profit research organization')
+      this.showAboutModal = true;
     },
     reportProblem() {
-      alert('Report a problem feature coming soon!')
+      this.showReportModal = true;
     },
-    submitTransaction() {
-      if (!this.transactionId) {
-        alert('Please enter a transaction ID')
-        return
+    submitReport() {
+      if (!this.reportMessage.trim()) {
+        alert('Please enter a message');
+        return;
       }
-      alert('Transaction Submitted for Review')
-      this.transactionId = ''
+      alert('Feedback sent successfully!');
+      this.reportMessage = '';
+      this.showReportModal = false;
     },
-    updateProfile() {
-      // Update user data with form data
-      this.user.firstName = this.editForm.firstName
-      this.user.lastName = this.editForm.lastName
-      this.user.address = this.editForm.address
-      this.user.dob = this.editForm.dob
-      this.user.country = this.editForm.country
-      
-      alert('Profile Updated!')
-    }
+
+    submitTransaction() {
+      if (!this.transactionId) { alert('Please enter a transaction ID'); return; }
+      alert('Transaction Submitted for Review'); this.transactionId = '';
+    },
+    updateProfile() { alert('Profile Updated!') }
   }
 }
 </script>
 
 <style scoped>
-/* --- 1. DESIGN SYSTEM --- */
+/* --- 1. GLOBAL LAYOUT (No Body Scroll) --- */
 .user-profile-page {
   --bg-body: #050505;
   --bg-sidebar: #0a0a0a;
@@ -325,18 +394,16 @@ export default {
   --text-main: #FFFFFF;
   --text-muted: #A1A1AA;
   --brand-red: #FF3B30;
-  --brand-red-dark: #b92b23;
   --border-glass: rgba(255, 255, 255, 0.1);
-  --success-green: #10b981;
   --font-main: 'Inter', sans-serif;
   --font-display: 'Playfair Display', serif;
   
   font-family: var(--font-main);
   background-color: var(--bg-body);
   color: var(--text-main);
-  min-height: 100vh;
+  height: 100vh;        
+  overflow: hidden;     
   display: flex;
-  overflow-x: hidden;
   position: relative;
 }
 
@@ -359,293 +426,227 @@ export default {
   flex-direction: column;
   padding: 30px 20px;
   flex-shrink: 0;
-  position: fixed;
   height: 100vh;
   z-index: 100;
 }
 
 .brand {
-  font-family: var(--font-main);
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--brand-red);
-  background: #000000;
-  border: 1px solid var(--brand-red);
-  box-shadow: 0 4px 15px rgba(255, 59, 48, 0.15);
-  padding: 12px;
-  text-align: center;
-  border-radius: 8px;
-  margin-bottom: 40px;
-  letter-spacing: 0.5px;
+  font-weight: 700; color: var(--brand-red);
+  background: #000; border: 1px solid var(--brand-red);
+  padding: 12px; text-align: center; border-radius: 8px; margin-bottom: 40px;
 }
 
-.nav-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
+.nav-menu { display: flex; flex-direction: column; gap: 15px; }
 .nav-btn {
-  background: transparent;
-  border: 1px solid var(--border-glass);
-  color: var(--text-muted);
-  padding: 12px 15px;
-  border-radius: 8px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
+  background: transparent; border: 1px solid var(--border-glass); color: var(--text-muted);
+  padding: 12px 15px; border-radius: 8px; text-align: left; cursor: pointer;
+  text-decoration: none; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 10px;
 }
+.nav-btn:hover { border-color: var(--brand-red); color: white; background: rgba(255, 59, 48, 0.05); }
 
-.nav-btn:hover {
-  border-color: var(--brand-red);
-  color: white;
-  background: rgba(255, 59, 48, 0.05);
-  transform: translateY(-2px);
-}
-
-/* --- 3. MAIN CONTENT AREA --- */
+/* --- 3. MAIN CONTENT (Flex Column) --- */
 .main-content {
   flex-grow: 1;
-  margin-left: 260px;
-  padding: 40px;
-  max-width: 1600px;
+  display: flex;
+  flex-direction: column; 
+  padding: 30px;
+  height: 100vh;
+  overflow: hidden; 
 }
 
-/* Top Grid: Profile, Stats, Info */
+/* --- 3a. TOP GRID (Fixed Size) --- */
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr 1.5fr;
   gap: 20px;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+  flex-shrink: 0; 
 }
 
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
   border-radius: 12px;
-  padding: 25px;
+  padding: 20px;
   backdrop-filter: blur(10px);
 }
+.user-name { font-size: 1.4rem; font-weight: 600; color: white; margin-bottom: 5px; }
+.user-role { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px; }
+.user-inst { font-size: 0.85rem; color: #ddd; }
+.stat-group { margin-bottom: 10px; }
+.stat-label { font-size: 0.75rem; color: var(--text-muted); display: block; }
+.stat-value { font-size: 1.8rem; font-family: var(--font-display); line-height: 1; }
+.info-text { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
 
-/* Profile Card */
-.user-name { font-size: 1.5rem; font-weight: 600; margin-bottom: 5px; color: white; }
-.user-role { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
-.user-inst { font-size: 0.9rem; color: #ddd; }
-
-/* Stats Card */
-.stat-group { margin-bottom: 15px; }
-.stat-label { font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 5px; }
-.stat-value { font-size: 2rem; font-weight: 400; font-family: 'Playfair Display', serif; line-height: 1; }
-
-/* Info Card */
-.info-text { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
-
-/* --- 4. BOTTOM SECTION: Donation & Tabs --- */
+/* --- 3b. BOTTOM SPLIT (Takes Remaining Space) --- */
 .content-split {
+  flex-grow: 1;         
+  min-height: 0;        
   display: grid;
   grid-template-columns: 350px 1fr;
-  gap: 25px;
+  gap: 20px;
+  padding-bottom: 10px;
 }
 
-/* Donation Side */
+/* Left: Donation Card */
+.donation-card-container {
+  height: 100%;
+  overflow-y: auto; 
+  scrollbar-width: thin;
+  scrollbar-color: #333 transparent;
+}
+
 .donation-card {
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
   border-radius: 12px;
-  padding: 25px;
-  height: fit-content;
+  padding: 20px;
 }
-
-.btn-donate-header {
-  width: 100%;
-  background: #1e8e78;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 6px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  cursor: default;
-  text-align: center;
-}
-
-.donation-info { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; }
-.radio-group { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-.radio-dot { width: 12px; height: 12px; background: var(--brand-red); border-radius: 50%; display: inline-block; }
-
-.payment-details { margin-top: 15px; font-size: 0.9rem; color: #ccc; }
-.payment-details span { display: block; margin-bottom: 5px; }
-
+.btn-donate-header { background: #1e8e78; color: white; padding: 10px; border-radius: 6px; text-align: center; font-weight: 600; margin-bottom: 15px; }
+.donation-info { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
+.radio-group { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+.radio-dot { width: 10px; height: 10px; background: var(--brand-red); border-radius: 50%; }
 .input-group { margin-top: 15px; }
-.input-label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
-.form-input {
-  width: 100%;
-  background: var(--bg-input);
-  border: 1px solid #333;
-  color: white;
-  padding: 12px;
-  border-radius: 6px;
-  font-family: var(--font-main);
-  outline: none;
-  transition: border 0.3s;
-}
+.input-label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px; }
+.form-input { width: 100%; background: var(--bg-input); border: 1px solid #333; color: white; padding: 10px; border-radius: 6px; outline: none; }
 .form-input:focus { border-color: var(--brand-red); }
-
-.btn-apply {
-  margin-top: 15px;
-  background: transparent;
-  border: 1px solid var(--border-glass);
-  color: white;
-  padding: 8px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
+.btn-apply { margin-top: 15px; background: transparent; border: 1px solid var(--border-glass); color: white; padding: 8px 20px; border-radius: 6px; cursor: pointer; width: 100%; }
 .btn-apply:hover { background: rgba(255,255,255,0.1); }
 
-/* Tabs Section */
-.tabs-container {
+/* Right: Accordion Container (Internal Scrolling) */
+.accordion-scroll-container {
+  height: 100%;       
+  overflow-y: auto;   
+  padding-right: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.accordion-scroll-container::-webkit-scrollbar { width: 6px; }
+.accordion-scroll-container::-webkit-scrollbar-track { background: transparent; }
+.accordion-scroll-container::-webkit-scrollbar-thumb { background-color: #333; border-radius: 10px; }
+
+/* Accordion Item Styles */
+.accordion-item {
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
   border-radius: 12px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  min-height: 500px;
+  transition: all 0.3s ease;
+  flex-shrink: 0; 
 }
+.accordion-item.is-open { border-color: rgba(255, 59, 48, 0.3); }
 
-.tabs-header {
-  display: flex;
-  border-bottom: 1px solid var(--border-glass);
-  padding: 0 20px;
+.accordion-header {
+  width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 15px 20px; background: transparent; border: none; color: #eee;
+  font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 0.2s;
 }
+.accordion-header:hover { background: rgba(255,255,255,0.03); }
+.accordion-item.is-open .accordion-header { color: var(--brand-red); background: rgba(255, 59, 48, 0.05); }
 
-.tab-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  padding: 20px 15px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  position: relative;
-  transition: color 0.3s;
-  font-family: var(--font-main);
-}
+.chevron { font-size: 0.8rem; transition: transform 0.3s ease; }
+.accordion-item.is-open .chevron { transform: rotate(180deg); }
 
-.tab-btn:hover { color: white; }
+.accordion-body { border-top: 1px solid var(--border-glass); }
+.body-content { padding: 20px; }
 
-.tab-btn.active {
-  color: var(--brand-red);
-  font-weight: 500;
-}
-
-.tab-btn.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; width: 100%;
-  height: 2px;
-  background: var(--brand-red);
-}
-
-.tab-content {
-  padding: 30px;
-  display: none;
-  animation: fadeIn 0.4s ease;
-}
-.tab-content.active { display: block; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Tables (Login History / Donation) */
-.custom-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.custom-table th {
-  text-align: left;
-  padding: 15px;
-  color: var(--text-muted);
-  border-bottom: 1px solid #333;
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-.custom-table td {
-  padding: 15px;
-  border-bottom: 1px solid #222;
-  color: #eee;
-  font-size: 0.95rem;
-}
+/* Table & Form Inside Dropdowns */
+.custom-table { width: 100%; border-collapse: collapse; }
+.custom-table th, .custom-table td { padding: 12px; text-align: left; border-bottom: 1px solid #333; color: #eee; font-size: 0.9rem; }
+.custom-table th { color: var(--text-muted); font-weight: 500; }
 .custom-table tr:last-child td { border-bottom: none; }
 
-/* Edit Form Grid */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-.form-group { margin-bottom: 5px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .full-width { grid-column: span 2; }
-
-.btn-confirm {
-  background: transparent;
-  border: 1px solid var(--border-glass);
-  color: white;
-  padding: 10px 25px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: all 0.3s;
-}
+.project-detail-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+.detail-box { background: rgba(30, 60, 90, 0.3); border: 1px solid rgba(60, 100, 150, 0.3); padding: 15px; border-radius: 8px; }
+.detail-label { color: #5dade2; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
+.detail-content { color: white; font-size: 0.9rem; }
+.custom-select { width: 100%; padding: 10px; background: var(--bg-input); border: 1px solid #333; color: white; border-radius: 6px; cursor: pointer; }
+.btn-confirm { background: transparent; border: 1px solid var(--border-glass); color: white; padding: 10px 25px; border-radius: 6px; cursor: pointer; margin-top: 20px; transition: all 0.3s; }
 .btn-confirm:hover { border-color: var(--brand-red); background: rgba(255,59,48,0.1); }
 
-/* Project Info Style */
-.project-detail-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 20px;
-}
-.detail-box {
-  background: rgba(30, 60, 90, 0.3);
-  border: 1px solid rgba(60, 100, 150, 0.3);
+/* --- MODAL STYLES (NEW) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(5, 5, 5, 0.85); /* Dark backdrop */
+  backdrop-filter: blur(5px);
+  z-index: 1000; /* Above sidebar */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 20px;
-  border-radius: 8px;
 }
-.detail-label { color: #5dade2; font-size: 0.9rem; font-weight: 600; margin-bottom: 5px; }
-.detail-content { color: white; font-size: 0.95rem; }
 
-/* Select Dropdown */
-.custom-select {
-  width: 100%;
-  padding: 12px;
-  background: var(--bg-input);
+.modal-box {
+  background: #0d0d10;
   border: 1px solid #333;
-  color: white;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  cursor: pointer;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  animation: modalPop 0.3s ease-out;
 }
 
-/* Responsive */
+.large-box { max-width: 700px; }
+
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 15px 20px; border-bottom: 1px solid #222;
+}
+.modal-header h2 { font-size: 1.2rem; font-weight: 600; color: white; }
+.close-btn { background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; }
+.close-btn:hover { color: white; }
+
+.modal-body { padding: 25px; font-size: 0.95rem; color: #ccc; line-height: 1.6; }
+.mb-4 { margin-bottom: 1.5rem; }
+
+.section-title { font-size: 1rem; color: white; margin-bottom: 10px; font-weight: 600; }
+.feature-list { list-style: disc; padding-left: 20px; margin-bottom: 1.5rem; }
+.feature-list li { margin-bottom: 8px; }
+.footer-note { font-weight: 600; color: white; margin-top: 20px; }
+
+/* Report Textarea */
+.modal-textarea {
+  width: 100%;
+  height: 120px;
+  background: #1a1a1d;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 12px;
+  color: white;
+  resize: none;
+  font-family: inherit;
+  margin-bottom: 15px;
+}
+.modal-textarea:focus { border-color: var(--brand-red); outline: none; }
+
+.btn-modal-send {
+  background: transparent;
+  border: 1px solid #444;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-modal-send:hover { border-color: var(--brand-red); background: rgba(255,255,255,0.05); }
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Mobile Response */
 @media (max-width: 1100px) {
+  .user-profile-page { height: auto; overflow: auto; }
+  .main-content { height: auto; overflow: visible; }
   .dashboard-grid { grid-template-columns: 1fr; }
-  .content-split { grid-template-columns: 1fr; }
-  .sidebar { width: 80px; padding: 20px 10px; }
-  .brand span, .nav-btn span { display: none; }
-  .main-content { margin-left: 80px; padding: 20px; }
-  .nav-btn { text-align: center; justify-content: center; font-size: 1.2rem; }
-  .form-grid { grid-template-columns: 1fr; }
-  .full-width { grid-column: span 1; }
+  .content-split { grid-template-columns: 1fr; display: flex; flex-direction: column; }
+  .sidebar { display: none; }
+  .accordion-scroll-container { overflow: visible; height: auto; }
 }
 </style>
-

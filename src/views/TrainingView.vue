@@ -145,7 +145,7 @@
         <div class="glass-panel">
           <div class="panel-head">
             <span class="panel-label" style="color: var(--aki-primary);">● PERFORMANCE</span>
-            <span class="status-badge">{{ trainingStatus }}</span>
+            <span class="status-badge" :class="{ 'completed': trainingStatus === 'Completed' }">{{ trainingStatus }}</span>
           </div>
           <div class="panel-content-pad">
             
@@ -165,8 +165,11 @@
             </div>
 
             <div class="chart-area">
-               <ion-icon name="bar-chart-outline"></ion-icon>
-               <span>{{ chartPlaceholderText }}</span>
+               <div v-if="isTraining" class="loader"></div>
+               <template v-else>
+                 <ion-icon name="bar-chart-outline"></ion-icon>
+                 <span>{{ chartPlaceholderText }}</span>
+               </template>
             </div>
 
           </div>
@@ -249,6 +252,7 @@ export default {
       this.isTraining = true
       this.trainingStatus = 'Training...'
       
+      // Simulate API Call delay
       setTimeout(() => {
         this.isTraining = false
         this.trainingStatus = 'Completed'
@@ -257,7 +261,7 @@ export default {
           f1Score: '0.89',
           precision: '0.91'
         }
-      }, 2000)
+      }, 2500)
     },
 
     // Navigation
@@ -542,6 +546,7 @@ export default {
   padding: 10px; border-radius: 6px; outline: none; font-size: 0.8rem;
 }
 .f-input:focus { border-color: var(--aki-primary); }
+.f-input option { background: #111; color: white; }
 
 .divider {
   border-top: 1px solid var(--border-glass); margin-top: 10px; padding-top: 15px;
@@ -553,7 +558,7 @@ export default {
 .train-btn {
   margin-top: auto; 
   background: linear-gradient(90deg, var(--aki-primary) 0%, #00C2CE 100%); 
-  color: white; /* Changed from black to white */
+  color: white; 
   border: none;
   padding: 14px; 
   border-radius: 6px; 
@@ -580,7 +585,9 @@ export default {
 }
 
 /* Performance Elements */
-.status-badge { font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; color: #aaa; }
+.status-badge { font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; color: #aaa; transition: 0.3s; }
+.status-badge.completed { color: var(--aki-primary); background: var(--aki-primary-dim); border: 1px solid rgba(0,240,255,0.2); }
+
 .metrics-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .metric-card { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 10px; border-radius: 8px; text-align: center; }
 .m-val { font-size: 1.2rem; font-weight: 700; color: white; }
@@ -592,6 +599,22 @@ export default {
   min-height: 200px;
 }
 .chart-area ion-icon { font-size: 3rem; opacity: 0.3; }
+
+/* Loader for chart area */
+.loader {
+  border: 3px solid #333;
+  border-radius: 50%;
+  border-top: 3px solid var(--aki-primary);
+  width: 30px;
+  height: 30px;
+  -webkit-animation: spin 1s linear infinite; /* Safari */
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
 .placeholder-box { padding: 10px; border: 1px dashed #444; text-align: center; color: #666; font-size: 0.7rem; border-radius: 6px; }
 
