@@ -38,7 +38,7 @@ const routes = [
   },
   {
     path: '/process',
-    name: 'Process',
+    name: 'PREPROCESSING',
     component: () => import('../views/ProcessView.vue')
   },
   {

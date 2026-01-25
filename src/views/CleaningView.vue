@@ -1,9 +1,20 @@
 <template>
-  <div class="cleaning-container" :class="{ collapsed: isCollapsed }">
-    <nav class="sidebar" id="sidebar">
+  <div class="cleaning-container" :class="{ 'desktop-collapsed': isCollapsed }">
+    
+    <div 
+      class="mobile-overlay" 
+      :class="{ active: showMobileSidebar }"
+      @click="closeMobileSidebar"
+    ></div>
+
+    <nav class="sidebar" :class="{ 'mobile-open': showMobileSidebar }">
       <div class="logo-container">
         <ion-icon name="aperture-outline" style="font-size: 1.5rem; color: var(--aki-primary); vertical-align: middle;"></ion-icon>
         <span class="logo-text hide-on-collapse" style="margin-left: 10px;">AKI DATA CLEAN</span>
+        
+        <button class="mobile-close-btn" @click="closeMobileSidebar">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
       </div>
 
       <div class="tools-wrapper">
@@ -13,12 +24,12 @@
           <div class="tool-header" @click="toggleTool('dataclean')">
             <ion-icon name="water-outline"></ion-icon>
             <span class="tool-label">Data Cleaning</span>
-            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+            <ion-icon name="chevron-forward-outline" class="chevron" :class="{ rotated: activeTool === 'dataclean' }" style="margin-left: auto; font-size: 1rem; color: white;"></ion-icon>
           </div>
-          <div class="tool-content" :style="{ maxHeight: activeTool === 'dataclean' ? '600px' : '0' }">
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'dataclean' ? '2000px' : '0' }">
             <div class="form-pad hide-on-collapse">
               <div class="input-group">
-                <label class="sub-label">Select Column for Cleaning</label>
+                <label class="sub-label">Select Column</label>
                 <div class="custom-select-wrapper">
                   <select class="f-input" v-model="cleaningConfig.column">
                     <option value="" disabled selected>Choose column...</option>
@@ -30,7 +41,7 @@
                 </div>
               </div>
               <div class="input-group">
-                <label class="sub-label">Select Class to Clean</label>
+                <label class="sub-label">Target Class</label>
                  <div class="custom-select-wrapper">
                   <select class="f-input" v-model="cleaningConfig.targetClass">
                     <option value="" disabled selected>Choose class...</option>
@@ -42,7 +53,7 @@
                 </div>
               </div>
               <div class="input-group">
-                <label class="sub-label">Select Characters to Remove</label>
+                <label class="sub-label">Remove Characters</label>
                  <div class="custom-select-wrapper">
                   <select class="f-input" v-model="cleaningConfig.removeChars">
                     <option value="" disabled selected>Choose options...</option>
@@ -62,12 +73,12 @@
           <div class="tool-header" @click="toggleTool('replacer')">
             <ion-icon name="swap-vertical-outline"></ion-icon>
             <span class="tool-label">Replace Value</span>
-            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+            <ion-icon name="chevron-forward-outline" class="chevron" :class="{ rotated: activeTool === 'replacer' }" style="margin-left: auto; font-size: 1rem; color: white;"></ion-icon>
           </div>
-          <div class="tool-content" :style="{ maxHeight: activeTool === 'replacer' ? '500px' : '0' }">
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'replacer' ? '2000px' : '0' }">
             <div class="form-pad hide-on-collapse">
               <div class="input-group">
-                <label class="sub-label">Select Column for Replacement</label>
+                <label class="sub-label">Select Column</label>
                 <div class="custom-select-wrapper">
                   <select class="f-input" v-model="replacerConfig.column">
                     <option value="" disabled selected>Choose column...</option>
@@ -79,7 +90,7 @@
                 </div>
               </div>
               <div class="input-group">
-                <label class="sub-label">Select Class to Replace</label>
+                <label class="sub-label">Value to Replace</label>
                 <div class="custom-select-wrapper">
                   <select class="f-input" v-model="replacerConfig.currentValue">
                     <option value="" disabled selected>Choose options...</option>
@@ -91,8 +102,8 @@
                 </div>
               </div>
               <div class="input-group">
-                <label class="sub-label">Enter New Value</label>
-                <input type="text" class="f-input" v-model="replacerConfig.newValue">
+                <label class="sub-label">New Value</label>
+                <input type="text" class="f-input" v-model="replacerConfig.newValue" placeholder="Type value...">
               </div>
               <button class="btn-action primary-btn" @click="applyValueReplace">Replace Value</button>
             </div>
@@ -102,13 +113,13 @@
         <div class="tool-item" :class="{ active: activeTool === 'alphaint' }">
           <div class="tool-header" @click="toggleTool('alphaint')">
             <ion-icon name="swap-horizontal-outline"></ion-icon>
-            <span class="tool-label" style="line-height: 1.2;">Convert Alphanumeric to Integers</span>
-            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+            <span class="tool-label" style="line-height: 1.2;">Alpha to Integer</span>
+            <ion-icon name="chevron-forward-outline" class="chevron" :class="{ rotated: activeTool === 'alphaint' }" style="margin-left: auto; font-size: 1rem; color: white;"></ion-icon>
           </div>
-          <div class="tool-content" :style="{ maxHeight: activeTool === 'alphaint' ? '500px' : '0' }">
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'alphaint' ? '2000px' : '0' }">
             <div class="form-pad hide-on-collapse">
               <div class="input-group">
-                <label class="sub-label">Select Column for Conversion</label>
+                <label class="sub-label">Select Column</label>
                 <div class="custom-select-wrapper">
                   <select class="f-input" v-model="alphaIntConfig.column">
                     <option value="" disabled selected>Choose column...</option>
@@ -130,13 +141,12 @@
           <div class="tool-header" @click="toggleTool('rename')">
             <ion-icon name="text-outline"></ion-icon>
             <span class="tool-label">Rename Column</span>
-            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+            <ion-icon name="chevron-forward-outline" class="chevron" :class="{ rotated: activeTool === 'rename' }" style="margin-left: auto; font-size: 1rem; color: white;"></ion-icon>
           </div>
-          <div class="tool-content" :style="{ maxHeight: activeTool === 'rename' ? '500px' : '0' }">
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'rename' ? '2000px' : '0' }">
              <div class="form-pad hide-on-collapse">
-                
                 <div class="input-group">
-                  <label class="sub-label">Select Column to Rename</label>
+                  <label class="sub-label">Select Column</label>
                   <div class="custom-select-wrapper">
                     <select class="f-input" v-model="renameConfig.column">
                       <option value="" disabled selected>Choose column...</option>
@@ -149,8 +159,8 @@
                 </div>
 
                 <div class="input-group">
-                  <label class="sub-label">Enter New Column Name</label>
-                  <input type="text" class="f-input" v-model="renameConfig.newName">
+                  <label class="sub-label">New Column Name</label>
+                  <input type="text" class="f-input" v-model="renameConfig.newName" placeholder="Enter name...">
                 </div>
 
                 <button class="btn-action primary-btn" @click="renameColumn">Apply Rename</button>
@@ -162,11 +172,11 @@
           <div class="tool-header" @click="toggleTool('dropcol')">
             <ion-icon name="trash-outline"></ion-icon>
             <span class="tool-label">Drop Column</span>
-            <ion-icon name="chevron-down-outline" class="chevron" style="margin-left: auto; font-size: 0.8rem;"></ion-icon>
+            <ion-icon name="chevron-forward-outline" class="chevron" :class="{ rotated: activeTool === 'dropcol' }" style="margin-left: auto; font-size: 1rem; color: white;"></ion-icon>
           </div>
-          <div class="tool-content" :style="{ maxHeight: activeTool === 'dropcol' ? '500px' : '0' }">
+          <div class="tool-content" :style="{ maxHeight: activeTool === 'dropcol' ? '2000px' : '0' }">
             <div class="form-pad hide-on-collapse">
-               <label class="sub-label">Select Column to Drop</label>
+               <label class="sub-label">Select Column</label>
                <div class="custom-select-wrapper">
                   <select class="f-input">
                     <option>Select Column...</option>
@@ -194,30 +204,32 @@
       
       <header class="top-header">
         <div class="header-left">
-          <button class="menu-toggle" @click="toggleSidebar">
+          <button class="menu-toggle" @click="handleSidebarToggle">
             <ion-icon name="menu-outline"></ion-icon>
           </button>
         </div>
 
         <div class="header-center">
-          <div class="pipeline">
-            <div class="step active">CLEAN</div>
-            <div class="step">FILTER</div>
-            <div class="step">PROCESS</div>
-            <div class="step">TRAIN</div>
-            <div class="step">PREDICT</div>
+          <div class="pipeline-scroll">
+            <div class="pipeline">
+              <div class="step active">CLEAN</div>
+              <div class="step">FILTER</div>
+              <div class="step">PREPROCESSING</div>
+              <div class="step">TRAIN</div>
+              <div class="step">PREDICT</div>
+            </div>
           </div>
         </div>
 
         <div class="header-right">
-          <button class="top-nav-btn" @click="goHome">
+          <button class="top-nav-btn icon-only-mobile" @click="goHome">
             <ion-icon name="home-outline"></ion-icon>
-            <span>Home</span>
+            <span class="desktop-text">Home</span>
           </button>
           
-          <button class="top-nav-btn logout" @click="logout">
+          <button class="top-nav-btn logout icon-only-mobile" @click="logout">
             <ion-icon name="log-out-outline"></ion-icon>
-            <span>Logout</span>
+            <span class="desktop-text">Logout</span>
           </button>
           
           <div class="user-avatar">
@@ -230,7 +242,7 @@
         
         <div class="glass-panel">
           <div class="panel-head">
-            <span class="panel-label" style="color: var(--aki-primary);">Before Cleaning</span>
+            <span class="panel-label" style="color: var(--aki-primary);">Before</span>
             <ion-icon name="expand-outline" style="color:#666;"></ion-icon>
           </div>
           
@@ -267,7 +279,7 @@
 
         <div class="glass-panel">
           <div class="panel-head">
-            <span class="panel-label" style="color: var(--aki-primary);">After Cleaning</span>
+            <span class="panel-label" style="color: var(--aki-primary);">After</span>
             <ion-icon name="download-outline" style="color:#666; cursor: pointer;" @click="downloadTransformed"></ion-icon>
           </div>
 
@@ -312,33 +324,17 @@ export default {
   name: 'CleaningView',
   data() {
     return {
-      isCollapsed: false,
+      isCollapsed: false,       // For Desktop Mini Sidebar
+      showMobileSidebar: false, // For Mobile Drawer
       activeTool: 'rename', 
       
-      // === SEPARATED STATE VARIABLES ===
-      activeTabLeft: 'preview',  // Controls Raw Data Panel
-      activeTabRight: 'preview', // Controls Transformed Panel
+      activeTabLeft: 'preview',
+      activeTabRight: 'preview',
       
-      cleaningConfig: {
-        column: '',
-        targetClass: '',
-        removeChars: ''
-      },
-
-      replacerConfig: {
-        column: 'Transaction ID',
-        currentValue: '',
-        newValue: ''
-      },
-
-      alphaIntConfig: {
-        column: 'Transaction ID'
-      },
-      
-      renameConfig: {
-        column: 'Transaction ID',
-        newName: ''
-      },
+      cleaningConfig: { column: '', targetClass: '', removeChars: '' },
+      replacerConfig: { column: 'Transaction ID', currentValue: '', newValue: '' },
+      alphaIntConfig: { column: 'Transaction ID' },
+      renameConfig: { column: 'Transaction ID', newName: '' },
       
       rawData: [
         [13300000, 7420, 4, 3, 'yes'],
@@ -359,6 +355,10 @@ export default {
   },
   mounted() {
     this.transformedData = [...this.rawData]
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.handleResize)
   },
   methods: {
     formatCellValue(cell) {
@@ -368,17 +368,34 @@ export default {
       return cell
     },
 
-    toggleSidebar() {
-      this.isCollapsed = !this.isCollapsed
-      if(this.isCollapsed) {
-        this.activeTool = null
+    // Handles the hamburger button click
+    handleSidebarToggle() {
+      if (window.innerWidth <= 1024) {
+        // Mobile/Tablet: Open Off-canvas
+        this.showMobileSidebar = !this.showMobileSidebar
       } else {
-        this.activeTool = 'rename'
+        // Desktop: Minimize Sidebar
+        this.isCollapsed = !this.isCollapsed
+        if(this.isCollapsed) {
+          this.activeTool = null
+        } else {
+          this.activeTool = 'rename'
+        }
+      }
+    },
+
+    closeMobileSidebar() {
+      this.showMobileSidebar = false
+    },
+
+    handleResize() {
+      if (window.innerWidth > 1024) {
+        this.showMobileSidebar = false
       }
     },
 
     toggleTool(toolName) {
-      if(this.isCollapsed) {
+      if(this.isCollapsed && window.innerWidth > 1024) {
         this.isCollapsed = false
         setTimeout(() => { this.activeTool = toolName }, 200)
         return
@@ -387,60 +404,33 @@ export default {
     },
 
     applyCleaning() {
-      if(!this.cleaningConfig.column) {
-        alert("Please select a column first.")
-        return
-      }
-      alert(`Cleaning Applied!\nColumn: ${this.cleaningConfig.column}\nTarget: ${this.cleaningConfig.targetClass}\nRemoving: ${this.cleaningConfig.removeChars}`)
+      if(!this.cleaningConfig.column) { alert("Please select a column first."); return }
+      alert(`Cleaning Applied to ${this.cleaningConfig.column}`)
     },
-
     convertAlphaToInt() {
-      if(!this.alphaIntConfig.column) {
-        alert("Please select a column for conversion.")
-        return
-      }
-       alert(`Converting Alphanumeric to Integers for column: ${this.alphaIntConfig.column}`)
+      if(!this.alphaIntConfig.column) { alert("Please select a column."); return }
+      alert(`Converted ${this.alphaIntConfig.column}`)
     },
-
     applyValueReplace() {
-      if (!this.replacerConfig.column || !this.replacerConfig.currentValue || !this.replacerConfig.newValue) {
-        alert('Please fill all fields for Value Replacement')
-        return
-      }
-      alert('Value replacement applied!')
+      if (!this.replacerConfig.column || !this.replacerConfig.newValue) { alert('Fill all fields'); return }
+      alert('Value replaced!')
     },
-
     renameColumn() {
-      if (!this.renameConfig.newName) {
-        alert('Please enter a new name')
-        return
-      }
-      alert(`Column '${this.renameConfig.column}' renamed to: ${this.renameConfig.newName}`)
-      this.renameConfig.newName = ''
+      if (!this.renameConfig.newName) { alert('Enter new name'); return }
+      alert(`Renamed to: ${this.renameConfig.newName}`)
     },
-
-    goHome() {
-      this.$router.push('/')
-    },
-
-    logout() {
-      alert("Logging out...")
-      this.$router.push('/login')
-    },
-
-    goToFiltering() {
-      this.$router.push('/filtering')
-    },
-
-    downloadTransformed() {
-      alert('Downloading transformed data...')
-    }
+    goHome() { this.$router.push('/') },
+    logout() { this.$router.push('/login') },
+    goToFiltering() { this.$router.push('/filtering') },
+    downloadTransformed() { alert('Downloading...') }
   }
 }
 </script>
 
 <style scoped>
-/* --- DESIGN TOKENS --- */
+/* =================================================================
+   1. DESIGN TOKENS & BASE SETTINGS
+================================================================= */
 :host {
   --bg-deep: #050505;
   --bg-glass: rgba(20, 20, 20, 0.75);
@@ -450,8 +440,8 @@ export default {
   --aki-primary-dim: rgba(0, 240, 255, 0.08);
   --aki-danger: #FF2A6D;  
   
-  --text-main: #ffffff;
-  --text-muted: #888899;
+  --input-bg: #1e1e24;
+  --input-border: #444; 
   
   --sidebar-width: 280px;
   --sidebar-collapsed: 70px;
@@ -465,48 +455,80 @@ export default {
   background-image: 
     radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.05) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(255, 42, 109, 0.05) 0px, transparent 50%);
-  color: var(--text-main);
+  color: #ffffff;
   height: 100vh;
   display: flex;
   overflow: hidden;
-  transition: all var(--trans-speed);
+  position: relative;
 }
 
-/* ===========================
-   1. SIDEBAR
-=========================== */
+/* =================================================================
+   2. MOBILE OVERLAY
+================================================================= */
+.mobile-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 99;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.mobile-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =================================================================
+   3. SIDEBAR
+================================================================= */
 .sidebar {
   width: var(--sidebar-width);
   background: var(--bg-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   border-right: 1px solid var(--border-glass);
   display: flex;
   flex-direction: column;
-  transition: width var(--trans-speed);
+  transition: all var(--trans-speed);
   position: relative;
   z-index: 100;
   padding: 15px 0;
-  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.cleaning-container.collapsed .sidebar { width: var(--sidebar-collapsed); }
-.cleaning-container.collapsed .hide-on-collapse { opacity: 0; pointer-events: none; display: none; }
+.cleaning-container.desktop-collapsed .sidebar { width: var(--sidebar-collapsed); }
+.cleaning-container.desktop-collapsed .hide-on-collapse { opacity: 0; pointer-events: none; display: none; }
 
-/* Logo */
+/* Logo Area */
 .logo-container {
   padding: 0 20px 20px 20px;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .logo-text {
-  font-weight: 800;
-  font-size: 0.85rem;
-  letter-spacing: 1px;
+  font-weight: 800; font-size: 0.85rem; letter-spacing: 1px;
   background: linear-gradient(90deg, #fff, #bbb);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
-.cleaning-container.collapsed .logo-container { padding: 0 0 20px 0; text-align: center; }
+
+/* Mobile Close Button (Bright) */
+.mobile-close-btn {
+  background: rgba(255, 255, 255, 0.15); /* Visible background */
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white; 
+  font-size: 1.2rem;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  cursor: pointer; 
+  display: none; /* Hidden on desktop */
+  align-items: center; justify-content: center;
+  transition: 0.2s;
+}
+.mobile-close-btn:active { background: var(--aki-danger); border-color: var(--aki-danger); }
 
 /* Tools Wrapper */
 .tools-wrapper {
@@ -516,351 +538,248 @@ export default {
   padding: 0 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
+.tools-wrapper::-webkit-scrollbar { width: 4px; }
+.tools-wrapper::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
 
 .section-title {
-  font-size: 0.65rem;
-  color: #555;
-  font-weight: 700;
-  letter-spacing: 1px;
-  margin-bottom: 5px;
-  padding-left: 4px;
+  font-size: 0.65rem; color: #777; font-weight: 700;
+  letter-spacing: 1px; margin-bottom: 5px; padding-left: 4px;
 }
 
-/* Accordion Item */
+/* Tool Item */
 .tool-item {
-  border: 1px solid var(--border-glass);
-  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(to right, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
   border-radius: 8px;
   overflow: hidden;
   transition: 0.2s;
 }
 
 .tool-header {
-  padding: 10px 12px;
+  padding: 12px 14px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #aaa;
-  font-size: 0.8rem;
-  font-weight: 500;
-  transition: 0.2s;
-  min-height: 45px;
+  display: flex; align-items: center; gap: 12px;
+  color: #ccc; font-size: 0.85rem; font-weight: 600;
+  transition: 0.2s; min-height: 48px;
 }
 
-.tool-header ion-icon { font-size: 1rem; color: var(--aki-primary); flex-shrink: 0; }
-.tool-item:hover { background: rgba(255,255,255,0.05); }
-.tool-item.active { border-color: rgba(0, 240, 255, 0.4); background: var(--aki-primary-dim); }
+.tool-header ion-icon { font-size: 1.1rem; color: var(--aki-primary); flex-shrink: 0; }
+.tool-item:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+
+.tool-item.active { 
+  border-color: var(--aki-primary); 
+  background: var(--aki-primary-dim); 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
 .tool-item.active .tool-header { color: white; }
 
-.cleaning-container.collapsed .tool-header { justify-content: center; padding: 12px 0; }
-.cleaning-container.collapsed .tool-label, .cleaning-container.collapsed .chevron { display: none; }
+/* Chevron Rotation Logic: Right (Forward) to Down */
+.chevron { transition: transform 0.3s; }
+.chevron.rotated { transform: rotate(90deg); }
 
-/* Tool Content Form */
+.cleaning-container.desktop-collapsed .tool-header { justify-content: center; padding: 12px 0; }
+.cleaning-container.desktop-collapsed .tool-label, 
+.cleaning-container.desktop-collapsed .chevron { display: none; }
+
 .tool-content {
-  max-height: 0;
+  max-height: 0; 
+  /* Overflow set to hidden normally, but we rely on transition. 
+     The expanded state is large enough to allow flow. 
+     The parent .tools-wrapper handles the main scrolling. */
   overflow: hidden;
-  transition: max-height 0.3s ease;
-  background: rgba(0,0,0,0.3);
+  transition: max-height 0.4s ease-in-out;
+  background: rgba(0,0,0,0.2);
 }
-.tool-item.active .tool-content { border-top: 1px solid rgba(255,255,255,0.05); }
-
+.tool-item.active .tool-content { border-top: 1px solid rgba(255,255,255,0.1); }
 .form-pad { padding: 15px 12px; }
 
-/* --- INPUTS & LABELS & ANIMATION --- */
-.input-group {
-  margin-bottom: 15px;
-}
+/* =================================================================
+   4. INPUTS & BUTTONS (VISIBILITY FIX)
+================================================================= */
+.input-group { margin-bottom: 15px; }
+.sub-label { display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 8px; font-weight: 500; }
 
-.sub-label { 
-  display: block; 
-  font-size: 0.75rem; 
-  color: #e0e0e0; 
-  margin-bottom: 6px; 
-  font-weight: 500;
-}
+.custom-select-wrapper { position: relative; width: 100%; }
 
-.custom-select-wrapper {
-  position: relative;
-  transition: all 0.3s ease;
-  border-radius: 6px;
-}
-
-/* === TRANSPARENT DROPDOWN STYLING === */
 .f-input {
   width: 100%;
-  /* Transparent glass background */
-  background: rgba(255, 255, 255, 0.02); 
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--input-bg); 
+  border: 1px solid var(--input-border);
   color: white;
-  padding: 10px;
-  padding-right: 30px;
+  padding: 12px 12px;
+  padding-right: 35px;
   border-radius: 6px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   appearance: none;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.2s ease;
 }
+select.f-input option { background-color: #1a1a1a; color: white; padding: 10px; }
 
-/* Fallback for Options: 
-   Browser native dropdowns generally cannot be transparent. 
-   We set them to dark black to ensure readability. */
-select.f-input option {
-  background-color: #050505;
-  color: white;
-}
-
-/* Hover Animation */
-.f-input:hover, .custom-select-wrapper:hover .f-input {
-  border-color: var(--aki-primary);
-  background: rgba(0, 240, 255, 0.05); /* Slight tint on hover */
-  box-shadow: 0 4px 15px rgba(0, 240, 255, 0.15);
-  transform: translateY(-2px);
-}
-
+.f-input:hover { border-color: #777; background-color: #25252b; }
 .f-input:focus { 
-  border-color: var(--aki-danger); 
-  box-shadow: 0 0 10px rgba(255, 42, 109, 0.2);
+  border-color: var(--aki-primary); 
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.15);
   outline: none; 
 }
-
 .select-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #777;
-  pointer-events: none;
-  font-size: 0.9rem;
-  transition: color 0.3s;
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%); color: #888;
+  pointer-events: none; font-size: 0.9rem;
 }
+.custom-select-wrapper:hover .select-icon { color: white; }
 
-.custom-select-wrapper:hover .select-icon {
-  color: var(--aki-primary);
-}
-
-
-/* Buttons */
+/* PRIMARY ACTION BUTTONS (Bright White) */
 .btn-action {
-  width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border-glass);
-  background: linear-gradient(to right, #252525, #1a1a1a);
-  color: #ccc;
-  cursor: pointer;
-  font-size: 0.75rem;
-  font-weight: 600;
-  transition: 0.2s;
-  text-transform: capitalize;
+  width: 100%; padding: 12px;
+  border-radius: 6px; border: none;
+  cursor: pointer; font-size: 0.85rem; font-weight: 700;
+  transition: 0.2s; margin-top: 5px;
+  text-transform: uppercase; letter-spacing: 0.5px;
 }
-.btn-action:hover { border-color: var(--aki-primary); color: white; }
 
+/* Apply White Color to Primary Buttons */
 .primary-btn {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid #444;
+  background: #FFFFFF; 
+  color: #000000; /* Dark Text for Contrast */
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
 }
-.primary-btn:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: #666;
+.primary-btn:hover { 
+  background: #e6e6e6; 
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4); 
 }
 
-.danger-btn {
+.danger-btn { 
   background: rgba(255,42,109,0.1); 
-  color: #ff2a6d; 
-  border-color: #ff2a6d;
+  border: 1px solid var(--aki-danger);
+  color: var(--aki-danger); 
 }
-.danger-btn:hover {
-  background: rgba(255,42,109,0.2); 
-}
+.danger-btn:hover { background: var(--aki-danger); color: white; }
 
 /* Sidebar Footer */
-.sidebar-footer {
-  margin-top: auto;
-  padding: 15px 12px;
-  border-top: 1px solid var(--border-glass);
-}
+.sidebar-footer { margin-top: auto; padding: 15px 12px; border-top: 1px solid var(--border-glass); }
 .nav-next {
-  width: 100%;
-  background: var(--aki-danger);
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  box-shadow: 0 4px 15px rgba(255, 42, 109, 0.2);
-  transition: 0.2s;
+  width: 100%; background: var(--aki-danger); color: white;
+  padding: 12px; border: none; border-radius: 6px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; font-weight: 700; box-shadow: 0 4px 15px rgba(255, 42, 109, 0.2);
 }
-.nav-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 42, 109, 0.4); }
-.cleaning-container.collapsed .nav-next span { display: none; }
+.cleaning-container.desktop-collapsed .nav-next span { display: none; }
 
-/* ===========================
-   2. MAIN VIEW
-=========================== */
+/* =================================================================
+   5. MAIN VIEW & HEADER
+================================================================= */
 .main-view {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
+  flex: 1; display: flex; flex-direction: column;
+  position: relative; overflow: hidden; width: 100%;
 }
 
 .top-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 30px;
-  border-bottom: 1px solid var(--border-glass);
-  position: relative; /* Needed for absolute center positioning */
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 15px 20px; border-bottom: 1px solid var(--border-glass);
+  background: rgba(5,5,5,0.8); z-index: 50;
+  flex-wrap: wrap; gap: 10px;
 }
 
-.header-left { display: flex; align-items: center; gap: 20px; z-index: 2; }
-.header-right { display: flex; align-items: center; gap: 15px; z-index: 2; }
-
-/* === HEADER CENTER (PIPELINE) === */
-.header-center {
-  position: absolute;
-  left: 42%; /* MOVED LEFT from 50% */
-  transform: translateX(-50%);
-  z-index: 1;
-}
-
+/* HAMBURGER BUTTON (Bright and Visible) */
 .menu-toggle {
-  background: transparent; border: none; color: white;
-  font-size: 1.6rem; cursor: pointer; display: flex;
+  background: rgba(0, 240, 255, 0.1); /* Slight Cyan tint */
+  border: 1px solid var(--aki-primary); /* Visible Cyan Border */
+  color: var(--aki-primary); /* Cyan Icon */
+  font-size: 1.5rem; cursor: pointer; 
+  padding: 8px; border-radius: 6px; display: flex;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.15); /* Glow */
+  transition: all 0.3s ease;
 }
-.menu-toggle:hover { color: var(--aki-primary); }
+.menu-toggle:hover { 
+  background: var(--aki-primary); 
+  color: #000;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+}
 
+.header-center { flex: 1; display: flex; justify-content: center; overflow: hidden; }
+.pipeline-scroll { width: 100%; overflow-x: auto; display: flex; justify-content: center; }
 .pipeline {
   display: flex; gap: 4px; background: #0a0a0a;
   padding: 4px; border-radius: 50px; border: 1px solid #222;
+  white-space: nowrap;
 }
 .step {
-  padding: 5px 14px; border-radius: 40px; font-size: 0.7rem;
-  font-weight: 600; color: #555; cursor: default;
+  padding: 6px 16px; border-radius: 40px; font-size: 0.7rem;
+  font-weight: 600; color: #555;
 }
-.step.active {
-  background: #1f1f1f; color: var(--aki-primary); border: 1px solid #333;
-}
+.step.active { background: #1f1f1f; color: var(--aki-primary); border: 1px solid #333; }
 
+.header-right { display: flex; align-items: center; gap: 10px; }
 .top-nav-btn {
-  background: transparent;
-  border: 1px solid var(--border-glass);
-  color: #aaa;
-  padding: 6px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  transition: 0.2s;
+  background: transparent; border: 1px solid var(--border-glass);
+  color: #aaa; padding: 6px 14px; border-radius: 20px;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  font-size: 0.8rem; transition: 0.2s;
 }
-.top-nav-btn:hover { border-color: #666; color: white; background: rgba(255,255,255,0.05); }
-.top-nav-btn.logout:hover { border-color: var(--aki-danger); color: var(--aki-danger); }
+.top-nav-btn:hover { color: white; border-color: #666; }
+.user-avatar { font-size: 2rem; color: #444; margin-left: 5px; }
 
-.user-avatar { font-size: 1.8rem; color: #444; display: flex; align-items: center; }
-
+/* =================================================================
+   6. CONTENT & RESPONSIVE
+================================================================= */
 .content-grid {
-  flex: 1;
-  padding: 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  overflow: hidden;
+  flex: 1; padding: 20px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 20px; overflow-y: auto; overflow-x: hidden;
 }
 
 .glass-panel {
   background: rgba(15, 15, 17, 0.6);
   border: 1px solid var(--border-glass);
   border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  display: flex; flex-direction: column;
+  overflow: hidden; min-height: 400px;
 }
 .panel-head {
-  padding: 12px 18px;
-  background: rgba(255,255,255,0.02);
-  border-bottom: 1px solid var(--border-glass);
-  display: flex; justify-content: center; align-items: center;
+  padding: 12px 18px; border-bottom: 1px solid var(--border-glass);
+  display: flex; justify-content: space-between; align-items: center;
 }
-.panel-label { font-size: 1.3rem; font-weight: 1000; color: #ddd; letter-spacing: 1px; }
+.panel-label { font-size: 1.1rem; font-weight: 700; color: #ddd; }
+
+.sub-tabs { display: flex; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-glass); overflow-x: auto; }
+.tab {
+  flex: 1; text-align: center; padding: 12px 0;
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  color: #666; cursor: pointer; white-space: nowrap; min-width: 80px;
+}
+.tab.active { color: #ff5e00; border-bottom: 2px solid #ff5e00; background: linear-gradient(to top, rgba(255,94,0,0.05), transparent); }
 
 .table-wrap { flex: 1; overflow: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 0.75rem; white-space: nowrap; }
-thead th {
-  position: sticky; top: 0; background: #141414; color: #777;
-  text-align: left; padding: 10px 16px; font-weight: 600;
-  border-bottom: 1px solid #333; z-index: 5;
-}
+thead th { position: sticky; top: 0; background: #141414; color: #888; text-align: left; padding: 12px 16px; border-bottom: 1px solid #333; z-index: 5; }
 tbody td { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); color: #ccc; }
-tbody tr:hover { background: rgba(0, 240, 255, 0.03); }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0a0a0a; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #555; }
-
-/* ====================================
-   UPDATED TAB MENU STYLING
-==================================== */
-.sub-tabs {
-  display: flex;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.3); /* Darker background strip */
-  border-bottom: 1px solid var(--border-glass);
-  padding: 0; 
+@media screen and (max-width: 1024px) {
+  .sidebar {
+    position: fixed; left: 0; top: 0; height: 100%;
+    transform: translateX(-100%); width: 280px;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+    border-right: 1px solid #333; z-index: 1000;
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .mobile-close-btn { display: flex; }
+  .logo-container { padding-right: 15px; }
+  .content-grid { grid-template-columns: 1fr; padding: 15px; }
+  .header-center { order: 3; width: 100%; margin-top: 10px; justify-content: flex-start; }
+  .pipeline-scroll { justify-content: flex-start; padding-bottom: 5px; }
+  .top-header { padding: 10px 15px; }
+  .f-input { padding: 14px; font-size: 0.9rem; }
+  .tool-header { padding: 14px; }
 }
 
-.tab {
-  /* THIS MAKES THEM DISTRIBUTE EVENLY */
-  flex: 1; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  padding: 14px 0; /* Vertical height */
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  cursor: pointer;
-  color: #666; /* Inactive text color */
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.tab:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.03);
-}
-
-/* --- ACTIVE STATE (Reddish-Orange) --- */
-.tab.active {
-  color: #ff5e00; 
-  background: linear-gradient(to top, rgba(255, 94, 0, 0.05), transparent);
-}
-
-/* Bottom Line Indicator */
-.tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: #ff5e00; 
-  box-shadow: 0 -2px 10px rgba(255, 94, 0, 0.5);
+@media screen and (max-width: 480px) {
+  .logo-text { display: block; font-size: 0.8rem; }
+  .icon-only-mobile .desktop-text { display: none; }
+  .top-nav-btn { padding: 8px; border-radius: 50%; }
+  .pipeline { width: 100%; justify-content: space-between; }
+  .glass-panel { min-height: 300px; }
 }
 </style>
