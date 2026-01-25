@@ -11,11 +11,36 @@
         </div>
 
         <div class="nav-group center-group">
-          <div class="custom-select">
-            <!-- <select id="datasetSelect" v-model="selectedDataset" @change="handleDatasetChange">
-               <option value="modified">Modified Dataset (Current)</option>
-            </select> -->
-            <ion-icon name="chevron-down-outline" class="select-arrow"></ion-icon>
+          <div class="custom-select-wrapper">
+            <label class="select-label">Which Dataset you want to use?</label>
+            
+            <div class="custom-dropdown" :class="{ 'active': isDropdownOpen }">
+              <div class="dropdown-trigger" @click="toggleDropdown">
+                <span>{{ getDatasetLabel(selectedDataset) }}</span>
+                <ion-icon name="chevron-down-outline" class="dropdown-arrow"></ion-icon>
+              </div>
+
+              <transition name="fade">
+                <div v-if="isDropdownOpen" class="dropdown-menu">
+                  <div 
+                    class="dropdown-item" 
+                    :class="{ 'selected': selectedDataset === 'modified' }"
+                    @click="selectOption('modified')"
+                  >
+                    Modified Dataset
+                  </div>
+                  <div 
+                    class="dropdown-item" 
+                    :class="{ 'selected': selectedDataset === 'raw' }"
+                    @click="selectOption('raw')"
+                  >
+                    Raw Dataset
+                  </div>
+                </div>
+              </transition>
+            </div>
+
+            <div v-if="isDropdownOpen" class="click-outside-overlay" @click="isDropdownOpen = false"></div>
           </div>
         </div>
 
@@ -31,6 +56,21 @@
         <div v-if="notification.show" class="success-toast">
           <ion-icon name="checkmark-circle" style="font-size: 1.2rem;"></ion-icon>
           <span>{{ notification.message }}</span>
+        </div>
+      </div>
+
+      <div v-if="showConfirmationModal" class="modal-overlay">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Confirm Action</h3>
+          </div>
+          <div class="modal-body">
+            <p>If you proceed with the Raw Dataset, all previous modifications will be lost.</p>
+          </div>
+          <div class="modal-actions">
+            <button class="btn-secondary" @click="cancelDatasetChange">Cancel</button>
+            <button class="btn-primary" @click="confirmDatasetChange">Proceed</button>
+          </div>
         </div>
       </div>
 
@@ -78,6 +118,8 @@ export default {
   data() {
     return {
       selectedDataset: 'modified',
+      isDropdownOpen: false, // Tracks custom dropdown state
+      showConfirmationModal: false,
       notification: {
         show: false,
         message: ''
@@ -110,8 +152,6 @@ export default {
         show: true,
         message: message
       }
-      
-      // Auto-hide notification after 4 seconds
       setTimeout(() => {
         this.notification.show = false
       }, 4000)
@@ -125,9 +165,41 @@ export default {
       this.$router.push('/cleaning')
     },
 
-    handleDatasetChange(event) {
-      const selectedOption = event.target.options[event.target.selectedIndex].text
-      this.showNotification(`Switched context to: ${selectedOption}`)
+    // --- Custom Dropdown Logic ---
+    getDatasetLabel(val) {
+      return val === 'modified' ? 'Modified Dataset' : 'Raw Dataset';
+    },
+
+    toggleDropdown() {
+      this.isDropdownOpen = !this.isDropdownOpen;
+    },
+
+    selectOption(value) {
+      this.isDropdownOpen = false; // Close dropdown
+
+      // If user clicks the one already selected, do nothing
+      if (value === this.selectedDataset) return;
+
+      if (value === 'raw') {
+        // Show modal warning before switching
+        this.showConfirmationModal = true;
+      } else {
+        // Switching to Modified is safe
+        this.selectedDataset = value;
+        this.showNotification(`Switched context to: Modified Dataset`);
+      }
+    },
+
+    confirmDatasetChange() {
+      // User Confirmed in Modal
+      this.selectedDataset = 'raw';
+      this.showConfirmationModal = false;
+      this.showNotification('Switched to Raw Dataset. Modifications lost.');
+    },
+
+    cancelDatasetChange() {
+      // User Cancelled in Modal - Do nothing (value stays 'modified')
+      this.showConfirmationModal = false;
     }
   },
   mounted() {
@@ -158,7 +230,6 @@ export default {
 .data-processing-container {
   background-color: var(--bg-color);
   color: var(--text-white);
-  /* Use fixed viewport height and hide body scroll */
   height: 100vh;
   width: 100vw;
   overflow: hidden; 
@@ -172,11 +243,11 @@ export default {
 .container {
   width: 100%;
   max-width: 1200px;
-  height: 100%; /* Fill the viewport */
+  height: 100%;
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.8s ease-out;
-  position: relative; /* For absolute positioning of notification */
+  position: relative;
 }
 
 @keyframes fadeIn {
@@ -185,14 +256,14 @@ export default {
 }
 
 /* =========================================
-   Navigation Bar (Updated for Split View)
+   Navigation Bar
    ========================================= */
 .nav-bar {
   display: flex;
-  justify-content: space-between; /* Pushes left/right groups to edges */
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  flex-shrink: 0; /* Prevents navbar from shrinking */
+  flex-shrink: 0;
 }
 
 .nav-group {
@@ -205,72 +276,140 @@ export default {
   justify-content: center;
   max-width: 400px;
   margin: 0 20px;
+  z-index: 50; /* Ensure dropdown appears above other nav elements */
 }
 
 /* =========================================
-   Dropdown Select
+   Custom Dropdown Styles (Transparent & Centered)
    ========================================= */
-.custom-select {
-  position: relative;
+.custom-select-wrapper {
+  display: flex;
+  flex-direction: column;
   width: 100%;
+  gap: 6px;
+  position: relative;
+  align-items: center; /* Center the Label */
 }
 
-select {
+.select-label {
+  font-size: 0.85rem;
+  color: var(--text-gray);
+  text-align: center; /* Center Text Alignment */
   width: 100%;
-  background-color: transparent; 
+  margin-bottom: 4px;
+}
+
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* Trigger Box */
+.dropdown-trigger {
+  width: 100%;
+  background-color: transparent;
   border: 1px solid var(--border-color);
   color: var(--text-white);
   padding: 12px 15px;
-  padding-right: 40px;
   border-radius: 8px;
-  appearance: none;
-  outline: none;
-  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   transition: all 0.3s;
   font-size: 0.95rem;
-}
-
-select:focus {
-  border-color: var(--primary-red);
-  box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.1);
   background-color: rgba(255, 255, 255, 0.02);
 }
 
-select option {
-  background-color: var(--card-bg); 
-  color: var(--text-white);         
-  padding: 12px;
+.custom-dropdown.active .dropdown-trigger,
+.dropdown-trigger:hover {
+  border-color: var(--primary-red);
+  box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.1);
 }
 
-.select-arrow {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
+.dropdown-arrow {
   color: var(--text-gray);
   font-size: 1rem;
+  transition: transform 0.3s ease;
 }
+
+.custom-dropdown.active .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu Options */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  z-index: 101;
+}
+
+.dropdown-item {
+  padding: 12px 15px;
+  color: var(--text-gray);
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+/* Hover & Active States - Dark/Transparent Style */
+.dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.08); /* Subtle light overlay */
+  color: var(--text-white);
+}
+
+.dropdown-item.selected {
+  background-color: rgba(229, 57, 53, 0.15); /* Red tint for selected */
+  color: var(--primary-red);
+  font-weight: 600;
+}
+
+/* Transitions */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s, transform 0.2s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+/* Overlay to close dropdown */
+.click-outside-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 40; /* Below dropdown menu (101) but above everything else */
+  background: transparent;
+}
+
 
 /* =========================================
    Buttons
    ========================================= */
 .btn-secondary {
-  padding: 12px 20px;
+  padding: 10px 20px;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
   font-size: 0.9rem;
   background-color: rgba(255, 255, 255, 0.03);
   color: var(--text-gray);
   border: 1px solid var(--border-color);
   backdrop-filter: blur(5px);
   transition: all 0.3s ease;
-  white-space: nowrap;
 }
 
 .btn-secondary:hover {
@@ -303,15 +442,15 @@ select option {
 }
 
 /* =========================================
-   Notification (Updated Position)
+   Notification
    ========================================= */
 .notification-container {
-  position: absolute; /* Takes it out of flow */
-  top: 60px;          /* Positions it slightly below navbar, but "upper" */
+  position: absolute;
+  top: 60px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
-  pointer-events: none; /* Let clicks pass through if invisible */
+  pointer-events: none;
 }
 
 .success-toast {
@@ -330,8 +469,6 @@ select option {
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   backdrop-filter: blur(12px);
   animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  opacity: 0;
-  transform: translateY(-20px) scale(0.95);
 }
 
 @keyframes popIn {
@@ -340,20 +477,67 @@ select option {
 }
 
 /* =========================================
-   Data Card (Flex Layout for Internal Scroll)
+   Modal (Confirmation)
+   ========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  width: 90%;
+  max-width: 450px;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  border-top: 3px solid var(--primary-red);
+}
+
+.modal-header h3 {
+  margin: 0 0 10px 0;
+  color: var(--text-white);
+  font-size: 1.2rem;
+}
+
+.modal-body p {
+  color: var(--text-gray);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* =========================================
+   Data Card
    ========================================= */
 .data-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 16px;
-  padding: 0; /* Removing padding to let table flush with edges if needed, or manage via inner div */
+  padding: 0;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
   position: relative;
-  overflow: hidden; /* Prevents card from spilling over */
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  flex-grow: 1; /* Takes up all remaining vertical space */
-  margin-bottom: 20px; /* Small bottom margin */
+  flex-grow: 1;
+  margin-bottom: 20px;
 }
 
 .data-card::before {
@@ -371,7 +555,7 @@ select option {
   padding: 20px 25px;
   background-color: var(--card-bg);
   border-bottom: 1px solid var(--border-color);
-  flex-shrink: 0; /* Header stays fixed size */
+  flex-shrink: 0;
 }
 
 .card-header h2 {
@@ -382,22 +566,22 @@ select option {
 }
 
 /* =========================================
-   Scrollable Table Area
+   Table
    ========================================= */
 .table-wrapper {
-  flex-grow: 1; /* Fills the rest of the card */
-  overflow: hidden; /* Contains the scrollable area */
+  flex-grow: 1;
+  overflow: hidden;
   position: relative;
 }
 
 .table-responsive {
-  height: 100%;     /* Fills wrapper */
+  height: 100%;
   width: 100%;
-  overflow-y: auto; /* ENABLE VERTICAL SCROLL HERE */
-  overflow-x: auto; /* Horizontal scroll if needed */
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
-/* Custom Scrollbar Styling */
+/* Custom Scrollbar */
 .table-responsive::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -427,13 +611,12 @@ th, td {
 }
 
 thead th {
-  background-color: #1a1a1a; /* Dark background for sticky header */
+  background-color: #1a1a1a;
   color: var(--text-gray);
   font-weight: 600;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  /* STICKY HEADER MAGIC */
   position: sticky;
   top: 0;
   z-index: 10;
@@ -455,7 +638,7 @@ tbody td {
 }
 
 /* =========================================
-   Responsive Design
+   Responsive
    ========================================= */
 @media (max-width: 900px) {
   .nav-bar {
