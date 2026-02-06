@@ -1,132 +1,39 @@
-# Training.html to Vue.js Conversion Plan
+# TrainingView.vue Design Conversion - TODO List
 
-## Information Gathered
+## Overview
+Convert TrainingView.vue to match CleaningView.vue's glassmorphism design with cyan accents, collapsible sidebar, and modern UI elements.
 
-### Training.html Analysis:
-- **File**: Training.html (Model Training interface for AKI DataSuite)
-- **Styling**: Custom CSS with theme variables, glassmorphism effects, and dark theme
-- **Icons**: Ionicons 7.1.0
-- **Fonts**: Inter font family
-- **Main Components**: 
-  - Sidebar with model selection (9 ML models)
-  - Configuration panel with hyperparameters
-  - Model performance visualization area
-  - Modal for target column selection
-  - Pipeline stepper navigation
+## Tasks
 
-### Current Vue.js Project Structure:
-- Located in `/home/partho/AKi Test UI with JS Only/`
-- Uses Vue 3 with Vite build system
-- Has existing views: HomeView, ProcessView, CleaningView, etc.
-- Routing is configured in `src/router/index.js`
-- ProcessView.vue already navigates to `/training` route
+### Phase 1: Template Structure Updates
+- [ ] 1.1 Update container class and add gradient backgrounds
+- [ ] 1.2 Redesign sidebar with collapsible tool items style
+- [ ] 1.3 Add hamburger menu button to top header
+- [ ] 1.4 Convert navigation tabs to pipeline steps
+- [ ] 1.5 Add ionicons to buttons and controls
+- [ ] 1.6 Update panels to glass panel style
+- [ ] 1.7 Add custom styled selects with icons
 
-## Vue.js Conversion Plan
+### Phase 2: Script Updates
+- [ ] 2.1 Add isCollapsed state for sidebar
+- [ ] 2.2 Add activeTool state for sidebar sections
+- [ ] 2.3 Add mobile sidebar toggle methods
+- [ ] 2.4 Update navigation to use router.push
 
-### 1. Create TrainingView.vue
-```
-src/views/TrainingView.vue
-```
+### Phase 3: Style Updates
+- [ ] 3.1 Update CSS variables (cyan accent, glass effects)
+- [ ] 3.2 Add glassmorphism styles (backdrop blur, gradients)
+- [ ] 3.3 Redesign sidebar with tool items styling
+- [ ] 3.4 Update button styles (white primary with dark text)
+- [ ] 3.5 Add glow effects and transitions
+- [ ] 3.6 Update table styles (sticky headers, better colors)
+- [ ] 3.7 Add responsive styles with mobile overlay
 
-### 2. Component Structure
-- **Template Section**: Convert HTML structure to Vue template syntax
-- **Script Section**: Convert JavaScript logic to Vue component logic
-- **Style Section**: Extract and adapt CSS styling
+### Phase 4: Testing
+- [ ] 4.1 Test sidebar collapse functionality
+- [ ] 4.2 Test mobile responsive design
+- [ ] 4.3 Verify all interactive elements work
+- [ ] 4.4 Check chart rendering
 
-### 3. Key Features to Implement
+## Status: In Progress
 
-#### Reactive Data:
-- `selectedModel` - Currently selected ML model
-- `showTargetModal` - Controls target selection modal visibility
-- `selectedTarget` - Currently selected target column
-- `isTraining` - Training status
-- `modelPerformance` - Performance metrics
-- `hyperparameters` - Model configuration values
-
-#### Methods:
-- `selectModel(model)` - Handle model selection from sidebar
-- `openTargetModal()` - Show target column selection modal
-- `confirmTarget()` - Confirm target column selection
-- `startTraining()` - Initiate model training
-- `goToPredict()` - Navigate to prediction step
-- `goToProcess()` - Navigate back to processing step
-
-#### Vue Router Integration:
-- Add `/training` route to `src/router/index.js`
-- Update navigation logic to use Vue Router
-
-### 4. Styling Conversion Strategy
-
-#### Maintain Current Design:
-- Extract all CSS custom properties and styles
-- Preserve glassmorphism effects and dark theme
-- Keep all animations and transitions
-- Maintain responsive design patterns
-
-#### Vue-Specific Enhancements:
-- Use `v-model` for form bindings
-- Implement `v-for` for model list rendering
-- Add Vue transitions for modal and interactions
-- Use computed properties for dynamic styling
-
-### 5. Interactive Features
-
-#### Model Selection:
-- Convert static model list to dynamic array
-- Implement click handlers for model selection
-- Add visual feedback for active model
-
-#### Modal System:
-- Convert JavaScript modal to Vue reactive modal
-- Handle modal open/close states
-- Implement target column selection logic
-
-#### Configuration Panel:
-- Bind form inputs to reactive data
-- Handle hyperparameter updates
-- Validate configuration before training
-
-#### Performance Visualization:
-- Implement placeholder charts with Vue reactive data
-- Add training status indicators
-- Display performance metrics
-
-### 6. Navigation Integration
-
-#### Pipeline Stepper:
-- Update ProcessView.vue navigation to use Vue Router
-- Add breadcrumb navigation
-- Implement step validation
-
-#### Step Flow:
-- Cleaning → Filtering → Processing → **Training** → Prediction
-
-## Implementation Steps
-
-1. **Create TrainingView.vue file**
-2. **Add /training route to router**
-3. **Implement model selection functionality**
-4. **Create target selection modal**
-5. **Add hyperparameter configuration**
-6. **Implement training simulation**
-7. **Add performance visualization**
-8. **Test navigation flow**
-9. **Verify responsive design**
-10. **Optimize performance**
-
-## Files to be Created/Modified
-
-### New Files:
-- `src/views/TrainingView.vue` - Main training interface component
-
-### Modified Files:
-- `src/router/index.js` - Add training route
-- `src/views/ProcessView.vue` - Update navigation method
-
-## Expected Outcome
-- Fully functional TrainingView.vue component
-- Seamless navigation from ProcessView to TrainingView
-- Interactive model selection and configuration
-- Target column selection modal
-- Training simulation with performance metrics
-- Consistent styling with existing Vue components
