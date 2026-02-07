@@ -3,8 +3,7 @@
     <div class="ambient-light light-1"></div>
     <div class="ambient-light light-2"></div>
 
-    <div class="glass-container">
-      
+    <div class="glass-container">      
       <header class="dashboard-header">
         <div class="brand">
           <div class="logo-box">
@@ -32,28 +31,28 @@
         
         <section class="panel left-panel">
           <div class="panel-header">
-            <h2>Select Node</h2>
-            <p>Choose an existing neural configuration.</p>
+            <h2>Select your exesting project</h2>
+            <p>Choose an existing project configuration.</p>
           </div>
 
           <div class="control-group">
-            <label>Active Projects</label>
+            <label>Select Project</label>
             <div class="select-wrapper">
               <select v-model="selectedProject" @change="clearUpload">
-                <option value="" disabled>-- Select Stream --</option>
-                <option value="demo">Demo Project (Regression)</option>
-                <option value="vision">Vision V1 (Classification)</option>
-                <option value="signal">Signal Test 04 (Processing)</option>
+                <option value="" >-- Select Your Project --</option>
+                <option value="demo">myMargedData</option>
+                <option value="vision">IEB dataset</option>
+                <option value="signal">test</option>
               </select>
               <ion-icon name="chevron-down" class="arrow"></ion-icon>
             </div>
           </div>
 
           <div class="control-group grow">
-            <label>Objectives / Notes</label>
+            <label>Description (Optional)</label>
             <textarea 
               v-model="projectDescription" 
-              placeholder="Define processing parameters..."
+              placeholder=""
             ></textarea>
           </div>
         </section>
@@ -66,8 +65,14 @@
 
         <section class="panel right-panel">
           <div class="panel-header">
-            <h2>Upload Data</h2>
-            <p>Ingest raw CSV or XLSX datasets.</p>
+            <h2>Upload New Data</h2>
+            <div class="">
+            <label>Project Name</label>
+            <textarea 
+              v-model="projectname" 
+              placeholder=""
+            ></textarea>
+          </div>
           </div>
 
           <label 
@@ -97,15 +102,22 @@
           <input type="file" id="file-input" accept=".csv, .xlsx" @change="handleFileSelect" ref="fileInput">
 
           <div class="action-area">
-             <div class="info-tag">
-               <ion-icon name="scan-outline"></ion-icon>
-               <span>Type: {{ problemTypeShort }}</span>
-             </div>
+            <div class="problem-type-selector">
+              <div class="dropdown-label">Select Problem Type</div>
+              <select id="problem-type" v-model="selectedType" class="type-dropdown">
+                <option value="">Choose problem type</option>
+                <option value="regression">Regression</option>
+                <option value="classification">Classification</option>
+              </select>
+              <div class="selected-display">
+                {{ selectedType ? (selectedType === 'regression' ? ' Regression' : ' Classification') : 'Choose problem type' }}
+              </div>
+            </div>
 
-             <button class="btn-gradient large" @click="submitProject">
-                <span>Initialize Processing</span>
-                <ion-icon name="rocket-outline"></ion-icon>
-             </button>
+            <button class="btn-gradient large" @click="submitProject">
+              <span>Initialize Processing</span>
+              <ion-icon name="rocket-outline"></ion-icon>
+            </button>
           </div>
         </section>
 
@@ -122,6 +134,8 @@ export default {
       selectedProject: '',
       uploadedFile: null,
       projectDescription: '',
+      projectname: '',
+      selectedType: '',
       problemTypeShort: 'WAITING INPUT'
     }
   },
@@ -549,6 +563,126 @@ select option { background-color: #111; }
 }
 
 .info-tag ion-icon { color: var(--neon-start); font-size: 1.2rem; }
+
+/* ============================
+   Problem Type Selector (New)
+   ============================ */
+.problem-type-selector {
+  position: relative;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dropdown-label {
+  font-size: 0.75rem;
+  color: var(--neon-start);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.selected-display {
+  position: absolute;
+  top: 28px;
+  left: 16px;
+  right: 40px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: white;
+  pointer-events: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.problem-type-selector::before {
+  content: '';
+  position: absolute;
+  inset: 28px 0 0 0;
+  background: linear-gradient(135deg, rgba(255, 65, 108, 0.1), rgba(255, 75, 43, 0.05));
+  border-radius: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.problem-type-selector:hover::before,
+.problem-type-selector .type-dropdown:focus ~ ::before {
+  opacity: 1;
+}
+
+.type-dropdown {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--glass-border);
+  color: transparent;
+  border-radius: 12px;
+  padding: 12px 16px;
+  padding-right: 40px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  outline: none;
+}
+
+.type-dropdown:hover {
+  border-color: var(--neon-start);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 20px rgba(255, 65, 108, 0.15);
+  transform: translateY(-1px);
+}
+
+.type-dropdown:focus {
+  border-color: var(--neon-start);
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 25px rgba(255, 65, 108, 0.2), inset 0 0 15px rgba(255, 65, 108, 0.05);
+}
+
+.type-dropdown option {
+  background-color: #1a1a1a;
+  color: white;
+  padding: 10px;
+  font-weight: 500;
+}
+
+.type-dropdown option:hover {
+  background-color: rgba(255, 65, 108, 0.2);
+}
+
+/* Custom dropdown arrow */
+.problem-type-selector::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-right: 2px solid var(--neon-start);
+  border-bottom: 2px solid var(--neon-start);
+  transform: translateY(calc(-50% + 8px)) rotate(45deg);
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.type-dropdown:hover ~ ::after,
+.type-dropdown:focus ~ ::after {
+  opacity: 1;
+}
 
 /* Responsive */
 @media (max-width: 1024px) {

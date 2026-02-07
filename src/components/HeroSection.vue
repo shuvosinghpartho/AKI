@@ -7,7 +7,7 @@
         :class="{ 'animate-fade-in-up': showAnimation }"
       >
         <span class="w-2 h-2 rounded-full bg-brand-red animate-pulse"></span>
-        <span class="text-xs font-medium text-gray-300 tracking-wide uppercase">System v4.0 Operational</span>
+        <span class="text-xs font-medium text-gray-300 tracking-wide uppercase">System v2.0 Operational</span>
       </div>
 
       <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 leading-[1.1] reveal"
@@ -36,7 +36,7 @@
         <button
           class="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-black font-bold text-lg hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
           @click="launchConsole">
-          Launch Console
+          User Guidelines
           <i class="fa-solid fa-arrow-right"></i>
         </button>
         <button

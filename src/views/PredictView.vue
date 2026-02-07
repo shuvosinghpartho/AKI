@@ -55,7 +55,7 @@
           <span>Previous</span>
         </button>
         <button class="nav-next" @click="goToNext">
-          <span>Next</span>
+          <span>Deploy</span>
           <ion-icon name="arrow-forward-outline"></ion-icon>
         </button>
       </div>
@@ -144,7 +144,7 @@
             </div>
           </div>
 
-          <button class="predict-btn" @click="runPrediction">Predict</button>
+          <!-- <button class="predict-btn" @click="runPrediction">Predict</button> -->
         </div>
 
         <div class="glass-panel">

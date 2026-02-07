@@ -10,7 +10,7 @@
     <nav class="sidebar" :class="{ 'mobile-open': showMobileSidebar }">
       <div class="logo-container">
         <ion-icon name="analytics-outline" style="font-size: 1.5rem; color: var(--aki-primary); vertical-align: middle;"></ion-icon>
-        <span class="logo-text hide-on-collapse" style="margin-left: 10px;">AKI DATA PROCESS</span>
+        <span class="logo-text hide-on-collapse" style="margin-left: 10px;">AKI DATA PREPROCESS</span>
         
         <button class="mobile-close-btn" @click="closeMobileSidebar">
           <ion-icon name="close-outline"></ion-icon>
@@ -324,8 +324,8 @@
       </div>
 
       <div class="sidebar-footer">
-        <button class="nav-next" @click="goToTraining">
-          <span>NEXT</span>
+        <button class="nav-next" @click="openTargetModal">
+          <span>NEXT STEP</span>
           <ion-icon name="arrow-forward-outline"></ion-icon>
         </button>
       </div>
@@ -368,6 +368,7 @@
       </header>
 
       <div class="content-grid">
+        <!-- BEFORE SECTION -->
         <div class="glass-panel">
           <div class="panel-head">
             <span class="panel-label">Before Modification</span>
@@ -384,32 +385,314 @@
             </div>
           </div>
           <div class="panel-content-pad">
-            <div class="chart-controls-wrapper">
-              <div class="inputs-row">
-                <div class="input-group-mini">
-                  <label>Names</label>
-                  <div class="custom-select-wrapper">
-                    <select class="f-input" v-model="beforeConfig.names">
-                      <option value="User_ID">User_ID</option>
-                      <option value="Feature1">Feature 1</option>
-                      <option value="Feature2">Feature 2</option>
-                    </select>
-                    <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+            <!-- PIE CHART (No changes) -->
+            <template v-if="selectedChartType === 'Pie'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>Names</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.pie.names">
+                        <option value="">User_ID</option>
+                        <option value="Feature1">Feature 1</option>
+                        <option value="Feature2">Feature 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
                   </div>
-                </div>
-                <div class="input-group-mini">
-                  <label>Values</label>
-                  <div class="custom-select-wrapper">
-                    <select class="f-input" v-model="beforeConfig.values">
-                      <option value="None">None</option>
-                      <option value="Value1">Value 1</option>
-                      <option value="Value2">Value 2</option>
-                    </select>
-                    <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                  <div class="input-group-mini">
+                    <label>Values</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.pie.values">
+                        <option value="None">None</option>
+                        <option value="Value1">Value 1</option>
+                        <option value="Value2">Value 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </template>
+
+            <!-- BOX CHART -->
+            <template v-else-if="selectedChartType === 'Box'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.box.y">
+                        <option value="">No options to select</option>
+                        <option value="Price">Price</option>
+                        <option value="Area">Area</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.box.x">
+                        <option value="Transaction ID">Transaction ID</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Color</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.box.color">
+                        <option value="Price Per Unit">Price Per Unit</option>
+                        <option value="None">None</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-if="!beforeConfig.box.y" class="warning-message">No Numerical Column is there for Box-Plot</div>
+            </template>
+
+            <!-- SCATTER CHART -->
+            <template v-else-if="selectedChartType === 'Scatter'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.scatter.x">
+                        <option value="">No options</option>
+                        <option value="Feature1">Feature 1</option>
+                        <option value="Feature2">Feature 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.scatter.y">
+                        <option value="">No options</option>
+                        <option value="Feature1">Feature 1</option>
+                        <option value="Feature2">Feature 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Color</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.scatter.color">
+                        <option value="None">None</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Size</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.scatter.size">
+                        <option value="None">None</option>
+                        <option value="Value">Value</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- VIOLIN CHART -->
+            <template v-else-if="selectedChartType === 'Violin'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.violin.y">
+                        <option value="">No options</option>
+                        <option value="Price">Price</option>
+                        <option value="Area">Area</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.violin.x">
+                        <option value="None">None</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Color</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.violin.color">
+                        <option value="None">None</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- LINE CHART -->
+            <template v-else-if="selectedChartType === 'Line'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.line.x">
+                        <option value="">No options</option>
+                        <option value="Index">Index</option>
+                        <option value="Time">Time</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.line.y">
+                        <option value="">No options</option>
+                        <option value="Value">Value</option>
+                        <option value="Price">Price</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Color</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.line.color">
+                        <option value="None">None</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- HISTOGRAM CHART -->
+            <template v-else-if="selectedChartType === 'Histogram'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.histogram.x">
+                        <option value="Transaction ID">Transaction ID</option>
+                        <option value="Price">Price</option>
+                        <option value="Area">Area</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.histogram.y">
+                        <option value="None">None</option>
+                        <option value="Count">Count</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Color</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.histogram.color">
+                        <option value="None">None</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- DISTPLOT CHART -->
+            <template v-else-if="selectedChartType === 'DistPlot'">
+              <div class="chart-controls-wrapper">
+                <div class="chart-label">Select numerical columns</div>
+                <div class="inputs-row">
+                  <div class="input-group-mini" style="grid-column: 1 / -1;">
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.distplot.columns" multiple>
+                        <option value="">No options to select</option>
+                        <option value="Price">Price</option>
+                        <option value="Area">Area</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-if="!beforeConfig.distplot.columns.length" class="warning-message">Please select at least one numerical column</div>
+            </template>
+
+            <!-- CO-RELATION CHART -->
+            <template v-else-if="selectedChartType === 'Co-relation'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.correlation.x">
+                        <option value="">No options</option>
+                        <option value="Feature1">Feature 1</option>
+                        <option value="Feature2">Feature 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.correlation.y">
+                        <option value="">No options</option>
+                        <option value="Feature1">Feature 1</option>
+                        <option value="Feature2">Feature 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- Z CHART -->
+            <template v-else-if="selectedChartType === 'Z'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>Distribution Visualization</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="beforeConfig.z.distribution">
+                        <option value="None">None</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Uniform">Uniform</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-if="beforeConfig.z.distribution === 'None'" class="warning-message">Please select a numerical column.</div>
+            </template>
+
             <div class="chart-display-area">
               <ion-icon :name="getChartIcon()"></ion-icon>
               <span>{{ selectedChartType }} Chart Preview</span>
@@ -417,9 +700,13 @@
           </div>
         </div>
 
+        <!-- AFTER SECTION -->
         <div class="glass-panel">
           <div class="panel-head">
             <span class="panel-label">After Modification</span>
+            <button v-if="selectedChartType !== 'Pie'" class="download-btn" @click="downloadChart" title="Download Chart">
+              <ion-icon name="download-outline"></ion-icon>
+            </button>
           </div>
           <div class="sub-tabs">
             <div 
@@ -433,32 +720,314 @@
             </div>
           </div>
           <div class="panel-content-pad">
-            <div class="chart-controls-wrapper">
-              <div class="inputs-row">
-                <div class="input-group-mini">
-                  <label>Names</label>
-                  <div class="custom-select-wrapper">
-                    <select class="f-input" v-model="afterConfig.names">
-                      <option value="User_ID">User_ID</option>
-                      <option value="Feature1">Feature 1</option>
-                      <option value="Feature2">Feature 2</option>
-                    </select>
-                    <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+            <!-- PIE CHART (No changes) -->
+            <template v-if="selectedChartType === 'Pie'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>Names</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.pie.names">
+                        <option value="">User_ID</option>
+                        <option value="Feature1">Feature 1</option>
+                        <option value="Feature2">Feature 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
                   </div>
-                </div>
-                <div class="input-group-mini">
-                  <label>Values</label>
-                  <div class="custom-select-wrapper">
-                    <select class="f-input" v-model="afterConfig.values">
-                      <option value="None">None</option>
-                      <option value="Value1">Value 1</option>
-                      <option value="Value2">Value 2</option>
-                    </select>
-                    <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                  <div class="input-group-mini">
+                    <label>Values</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.pie.values">
+                        <option value="None">None</option>
+                        <option value="Value1">Value 1</option>
+                        <option value="Value2">Value 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </template>
+
+            <!-- BOX CHART -->
+            <template v-else-if="selectedChartType === 'Box'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.box.y">
+                        <option value="">No options to select</option>
+                        <option value="Price">Price</option>
+                        <option value="Area">Area</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.box.x">
+                        <option value="Transaction ID">Transaction ID</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Color</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.box.color">
+                        <option value="Price Per Unit">Price Per Unit</option>
+                        <option value="None">None</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-if="!afterConfig.box.y" class="warning-message">No Numerical Column is there for Box-Plot</div>
+            </template>
+
+            <!-- SCATTER CHART -->
+            <template v-else-if="selectedChartType === 'Scatter'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.scatter.x">
+                        <option value="">No options</option>
+                        <option value="Feature1">Feature 1</option>
+                        <option value="Feature2">Feature 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.scatter.y">
+                        <option value="">No options</option>
+                        <option value="Feature1">Feature 1</option>
+                        <option value="Feature2">Feature 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Color</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.scatter.color">
+                        <option value="None">None</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Size</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.scatter.size">
+                        <option value="None">None</option>
+                        <option value="Value">Value</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- VIOLIN CHART -->
+            <template v-else-if="selectedChartType === 'Violin'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.violin.y">
+                        <option value="">No options</option>
+                        <option value="Price">Price</option>
+                        <option value="Area">Area</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.violin.x">
+                        <option value="None">None</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Color</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.violin.color">
+                        <option value="None">None</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- LINE CHART -->
+            <template v-else-if="selectedChartType === 'Line'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.line.x">
+                        <option value="">No options</option>
+                        <option value="Index">Index</option>
+                        <option value="Time">Time</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.line.y">
+                        <option value="">No options</option>
+                        <option value="Value">Value</option>
+                        <option value="Price">Price</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Color</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.line.color">
+                        <option value="None">None</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- HISTOGRAM CHART -->
+            <template v-else-if="selectedChartType === 'Histogram'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.histogram.x">
+                        <option value="Transaction ID">Transaction ID</option>
+                        <option value="Price">Price</option>
+                        <option value="Area">Area</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.histogram.y">
+                        <option value="None">None</option>
+                        <option value="Count">Count</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Color</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.histogram.color">
+                        <option value="None">None</option>
+                        <option value="Category">Category</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- DISTPLOT CHART -->
+            <template v-else-if="selectedChartType === 'DistPlot'">
+              <div class="chart-controls-wrapper">
+                <div class="chart-label">Select numerical columns</div>
+                <div class="inputs-row">
+                  <div class="input-group-mini" style="grid-column: 1 / -1;">
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.distplot.columns" multiple>
+                        <option value="">No options to select</option>
+                        <option value="Price">Price</option>
+                        <option value="Area">Area</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-if="!afterConfig.distplot.columns.length" class="warning-message">Please select at least one numerical column</div>
+            </template>
+
+            <!-- CO-RELATION CHART -->
+            <template v-else-if="selectedChartType === 'Co-relation'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>X</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.correlation.x">
+                        <option value="">No options</option>
+                        <option value="Feature1">Feature 1</option>
+                        <option value="Feature2">Feature 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                  <div class="input-group-mini">
+                    <label>Y</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.correlation.y">
+                        <option value="">No options</option>
+                        <option value="Feature1">Feature 1</option>
+                        <option value="Feature2">Feature 2</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- Z CHART -->
+            <template v-else-if="selectedChartType === 'Z'">
+              <div class="chart-controls-wrapper">
+                <div class="inputs-row">
+                  <div class="input-group-mini">
+                    <label>Distribution Visualization</label>
+                    <div class="custom-select-wrapper">
+                      <select class="f-input" v-model="afterConfig.z.distribution">
+                        <option value="None">None</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Uniform">Uniform</option>
+                      </select>
+                      <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-if="afterConfig.z.distribution === 'None'" class="warning-message">Please select a numerical column.</div>
+            </template>
+
             <div class="chart-display-area">
               <ion-icon :name="getChartIcon()"></ion-icon>
               <span>{{ selectedChartType }} Chart Preview</span>
@@ -468,6 +1037,36 @@
       </div>
 
     </main>
+
+    <!-- TARGET COLUMN SELECTION MODAL -->
+    <div v-if="showTargetModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h2>Select Target Column</h2>
+          <button class="modal-close-btn" @click="closeModal">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <label class="target-label">Select Target Column (Classification)</label>
+          <div class="custom-select-wrapper">
+            <select v-model="selectedTargetColumn" class="target-select">
+              <option value="" >Choose an option</option>
+              <option value="mainroad">Mainroad</option>
+              <option value="guestroom">Guestroom</option>
+              <option value="basement">Basement</option>
+              <option value="stories">Stories</option>
+            </select>
+            <ion-icon name="chevron-down-outline" class="select-icon"></ion-icon>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-submit" @click="submitTargetColumn">Submit</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -492,8 +1091,33 @@ const encodingConfig = ref({ column: '', type: '' });
 const featureConfig = ref({ type: '', columns: [] });
 const normalizationConfig = ref({ columns: [], scalerType: '' });
 
-const beforeConfig = ref({ names: 'User_ID', values: 'None' });
-const afterConfig = ref({ names: 'User_ID', values: 'None' });
+const beforeConfig = ref({
+  pie: { names: '', values: 'None' },
+  box: { y: '', x: 'Transaction ID', color: 'Price Per Unit' },
+  scatter: { x: '', y: '', color: 'None', size: 'None' },
+  violin: { y: '', x: 'None', color: 'None' },
+  line: { x: '', y: '', color: 'None' },
+  histogram: { x: 'Transaction ID', y: 'None', color: 'None' },
+  distplot: { columns: [] },
+  correlation: { x: '', y: '' },
+  z: { distribution: 'None' }
+});
+
+const afterConfig = ref({
+  pie: { names: '', values: 'None' },
+  box: { y: '', x: 'Transaction ID', color: 'Price Per Unit' },
+  scatter: { x: '', y: '', color: 'None', size: 'None' },
+  violin: { y: '', x: 'None', color: 'None' },
+  line: { x: '', y: '', color: 'None' },
+  histogram: { x: 'Transaction ID', y: 'None', color: 'None' },
+  distplot: { columns: [] },
+  correlation: { x: '', y: '' },
+  z: { distribution: 'None' }
+});
+
+// Modal state
+const showTargetModal = ref(false);
+const selectedTargetColumn = ref('');
 
 const toggleTool = (toolName) => {
   activeTool.value = activeTool.value === toolName ? null : toolName;
@@ -540,7 +1164,34 @@ const applyFeatureEngineering = () => console.log('Apply Feature Engineering:', 
 const applyNormalization = () => console.log('Apply Normalization:', normalizationConfig.value);
 
 const goHome = () => router.push('/');
-const goToTraining = () => router.push('/training');
+
+const downloadChart = () => {
+  const chartName = selectedChartType.value;
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+  const fileName = `${chartName}-chart-${timestamp}.png`;
+  console.log(`Downloading chart: ${fileName}`);
+  alert(`Chart "${chartName}" would be downloaded as "${fileName}"`);
+  // Implementation would use html2canvas or similar library to capture chart
+};
+
+const openTargetModal = () => {
+  showTargetModal.value = true;
+};
+
+const closeModal = () => {
+  showTargetModal.value = false;
+  selectedTargetColumn.value = '';
+};
+
+const submitTargetColumn = () => {
+  if (selectedTargetColumn.value) {
+    console.log('Target Column Selected:', selectedTargetColumn.value);
+    showTargetModal.value = false;
+    router.push('/training');
+  } else {
+    alert('Please select a target column');
+  }
+};
 </script>
 
 <style scoped>
@@ -858,6 +1509,45 @@ select.f-input option { background-color: #1a1a1a; color: white; padding: 10px; 
 
 .table-wrap { flex: 1; overflow: auto; }
 
+.warning-message {
+  background: rgba(140, 130, 40, 0.5);
+  border: 1px solid #8b8228;
+  color: #e0d060;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 15px 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.chart-label {
+  font-size: 0.8rem;
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.download-btn {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.download-btn:hover {
+  color: var(--aki-primary);
+  background: rgba(0, 240, 255, 0.1);
+}
+
 table { width: 100%; border-collapse: collapse; font-size: 0.75rem; white-space: nowrap; }
 
 thead th {
@@ -891,5 +1581,191 @@ tbody td { padding: 10px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.03
   .top-nav-btn { padding: 8px; border-radius: 50%; }
   .pipeline { width: 100%; justify-content: space-between; }
   .glass-panel { min-height: 300px; }
+}
+
+/* =================================================================
+   7. MODAL STYLES
+================================================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: rgba(15, 15, 17, 0.95);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  animation: slideUp 0.3s ease;
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-glass);
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(255, 42, 109, 0.02));
+}
+
+.modal-header h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  color: white;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.target-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--aki-primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.target-select {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--border-glass);
+  color: white;
+  border-radius: 8px;
+  padding: 14px 16px;
+  padding-right: 40px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  appearance: none;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.target-select:hover {
+  border-color: var(--aki-primary);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+}
+
+.target-select:focus {
+  border-color: var(--aki-primary);
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.05);
+}
+
+.target-select option {
+  background-color: #1a1a1a;
+  color: white;
+  padding: 10px;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-glass);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn-submit {
+  background: white;
+  color: #000;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+}
+
+.btn-submit:hover {
+  background: #e6e6e6;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+/* Modal responsive */
+@media screen and (max-width: 480px) {
+  .modal-content {
+    width: 95%;
+    max-width: none;
+  }
+
+  .modal-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .modal-footer {
+    padding: 12px 16px;
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 12px;
+  }
 }
 </style>

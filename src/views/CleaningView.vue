@@ -213,9 +213,9 @@
           <div class="pipeline-scroll">
             <div class="pipeline">
               <div class="step active">CLEANING</div>
-              <div class="step">FILTER</div>
+              <div class="step">FILTERING</div>
               <div class="step">PREPROCESSING</div>
-              <div class="step">TRAIN</div>
+              <div class="step">TRAINING</div>
               <div class="step">PREDICT</div>
             </div>
           </div>
@@ -242,7 +242,7 @@
         
         <div class="glass-panel">
           <div class="panel-head">
-            <span class="panel-label" style="color: var(--aki-primary);">Before</span>
+            <span class="panel-label" style="color: var(--aki-primary);">Before Modification</span>
             <ion-icon name="expand-outline" style="color:#666;"></ion-icon>
           </div>
           
@@ -279,7 +279,7 @@
 
         <div class="glass-panel">
           <div class="panel-head">
-            <span class="panel-label" style="color: var(--aki-primary);">After</span>
+            <span class="panel-label" style="color: var(--aki-primary);">After Modification</span>
             <ion-icon name="download-outline" style="color:#666; cursor: pointer;" @click="downloadTransformed"></ion-icon>
           </div>
 
@@ -326,7 +326,7 @@ export default {
     return {
       isCollapsed: false,       // For Desktop Mini Sidebar
       showMobileSidebar: false, // For Mobile Drawer
-      activeTool: 'rename', 
+      activeTool: '', 
       
       activeTabLeft: 'preview',
       activeTabRight: 'preview',

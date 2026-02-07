@@ -18,7 +18,7 @@
       </div>
 
       <div class="tools-wrapper">
-        <div class="section-title hide-on-collapse">FILTERING TOOLS</div>
+        <div class="section-title hide-on-collapse">TRANSFORMATION  TOOLS</div>
 
         <div class="tool-item" :class="{ active: activeTool === 'price' }">
           <div class="tool-header" @click="toggleTool('price')">
@@ -178,10 +178,10 @@
         <div class="header-center">
           <div class="pipeline-scroll">
             <div class="pipeline">
-              <div class="step">CLEAN</div>
+              <div class="step">CLEANING</div>
               <div class="step active">FILTERING</div>
               <div class="step">PREPROCESSING</div>
-              <div class="step">TRAIN</div>
+              <div class="step">TRAINING</div>
               <div class="step">PREDICT</div>
             </div>
           </div>
@@ -208,21 +208,22 @@
         
         <div class="glass-panel">
           <div class="panel-head">
-            <span class="panel-label" style="color: var(--aki-primary);">Before</span>
+            <span class="panel-label" style="color: var(--aki-primary);">Before Modification</span>
             <ion-icon name="expand-outline" style="color:#666;"></ion-icon>
           </div>
           
           <div class="sub-tabs">
             <span class="tab" :class="{ active: activeTabLeft === 'preview' }" @click="activeTabLeft = 'preview'">Preview</span>
             <span class="tab" :class="{ active: activeTabLeft === 'info' }" @click="activeTabLeft = 'info'">Info</span>
-            <span class="tab" :class="{ active: activeTabLeft === 'stats' }" @click="activeTabLeft = 'stats'">Stats</span>
+            <span class="tab" :class="{ active: activeTabLeft === 'features' }" @click="activeTabLeft = 'features'">Features</span>
+            <span class="tab" :class="{ active: activeTabLeft === 'describe' }" @click="activeTabLeft = 'describe'">Describe</span>
           </div>
 
           <div class="table-wrap">
             <table id="table-before">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>Index</th>
                   <th>Price</th>
                   <th>Area</th>
                   <th>Rooms</th>
@@ -243,21 +244,22 @@
 
         <div class="glass-panel">
           <div class="panel-head">
-            <span class="panel-label" style="color: var(--aki-primary);">After</span>
+            <span class="panel-label" style="color: var(--aki-primary);">After Modification</span>
             <ion-icon name="download-outline" style="color:#666; cursor: pointer;" @click="downloadFiltered"></ion-icon>
           </div>
 
           <div class="sub-tabs">
             <span class="tab" :class="{ active: activeTabRight === 'preview' }" @click="activeTabRight = 'preview'">Preview</span>
             <span class="tab" :class="{ active: activeTabRight === 'info' }" @click="activeTabRight = 'info'">Info</span>
-            <span class="tab" :class="{ active: activeTabRight === 'stats' }" @click="activeTabRight = 'stats'">Stats</span>
+            <span class="tab" :class="{ active: activeTabRight === 'features' }" @click="activeTabRight = 'features'">Features</span>
+            <span class="tab" :class="{ active: activeTabRight === 'describe' }" @click="activeTabRight = 'describe'">Describe</span>
           </div>
 
           <div class="table-wrap">
             <table id="table-after">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>Index</th>
                   <th>Price</th>
                   <th>Area</th>
                   <th>Rooms</th>
@@ -288,7 +290,7 @@ export default {
     return {
       isCollapsed: false,       
       showMobileSidebar: false, 
-      activeTool: 'price', 
+      activeTool: '', 
       
       activeTabLeft: 'preview',
       activeTabRight: 'preview',
